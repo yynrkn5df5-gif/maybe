@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>منصة الأستاذ أحمد أبو جبل التعليمية</title>
+    <style>
+        :root { 
+            --sand-bg: #F5F5DC; 
+            --primary: #2c3e50; 
+            --error: #e74c3c; 
+            --success: #27ae60; 
+            --ones-color: #e74c3c; 
+            --tens-color: #27ae60; 
+            --hundreds-color: #2980b9;
+            --gold-wm: rgba(212, 175, 55, 0.25); 
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation; 
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        input {
+            -webkit-user-select: auto;
+            user-select: auto;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--sand-bg); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            min-height: 100dvh;
+            margin: 0; 
+            padding: 10px; 
+            overflow: hidden; 
+        }
+        
+        .app-container { 
+            width: 100%; 
+            max-width: 500px; 
+            background: white; 
+            padding: 20px 15px; 
+            border-radius: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+            text-align: center; 
+            border: 8px solid var(--primary); 
+            position: relative; 
+            overflow: hidden; 
+            height: 92vh; 
+            height: 92dvh;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+        }
+
+        .side-watermark {
+            position: absolute; top: 0; bottom: 0; width: 40px;
+            display: flex; flex-direction: column; justify-content: space-around;
+            align-items: center; font-size: 1.1rem; font-weight: 900; 
+            color: var(--gold-wm); pointer-events: none; z-index: 1;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+        }
+        .wm-left { left: 5px; } 
+        .wm-right { right: 5px; }
+        .wm-text { transform: rotate(-90deg); white-space: nowrap; margin: 15px 0; }
+
+        .quiz-content { 
+            position: relative; 
+            z-index: 3; 
+            width: 100%; 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        
+        .instruction-note {
+            background: #fff9c4;
+            border: 2px dashed #fbc02d;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 15px;
+        }
+
+        .math-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr) 50px; 
+            align-items: center; 
+            direction: ltr; 
+            margin: 15px auto;
+            max-width: 100%;
+            gap: 5px;
+            position: relative;
+        }
+        
+        .carry-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 45px;
+        }
+
+        .carry-box {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--ones-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--ones-color);
+            background: #fff;
+            visibility: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .carry-box.show { visibility: visible; }
+        
+        .label { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+        .lbl-h { color: var(--hundreds-color); } 
+        .lbl-t { color: var(--tens-color); } 
+        .lbl-o { color: var(--ones-color); }
+        
+        .digit { font-size: clamp(3.5rem, 18vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .h-digit { color: var(--hundreds-color); } 
+        .t-digit { color: var(--tens-color); } 
+        .o-digit { color: var(--ones-color); }
+        
+        .sign { 
+            font-size: 3.5rem; 
+            color: var(--primary); 
+            font-weight: bold; 
+            grid-column: 4; 
+            grid-row: 4; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .v-line { 
+            grid-column: 1 / span 4; 
+            border-top: 8px solid var(--primary); 
+            margin: 15px 0; 
+            border-radius: 10px; 
+        }
+        
+        .input-cell { 
+            display: flex; 
+            justify-content: center; 
+            padding: 0 5px;
+            position: relative;
+        }
+        
+        .digit-input { 
+            width: 100%; 
+            height: clamp(85px, 25vw, 120px); 
+            font-size: clamp(3rem, 15vw, 4.5rem); 
+            font-weight: 900; 
+            text-align: center; 
+            border: 5px solid var(--primary); 
+            border-radius: 18px; 
+            outline: none; 
+            background: #fff; 
+            -webkit-appearance: none;
+            appearance: none;
+            color: var(--primary);
+            /* حلول لمشاكل الجوال */
+            line-height: normal;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        .digit-input:focus { border-color: #3498db; background-color: #f7fbff; }
+        .correct-box { background: #e8f5e9 !important; border-color: var(--success) !important; color: var(--success) !important; }
+        .wrong-box { background: #ffebee !important; border-color: var(--error) !important; color: var(--error) !important; }
+
+        .error-hint { color: var(--error); font-size: 1.4rem; font-weight: bold; display: block; margin: 10px 0; }
+        .click-prompt { 
+            font-size: 1.2rem; 
+            color: white; 
+            background: var(--primary); 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            display: inline-block; 
+            margin-top: 10px;
+            animation: pulse 1.5s infinite; 
+            cursor: pointer;
+        }
+        
+        #progress { 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        #hint-area { min-height: 100px; }
+        
+        @keyframes pulse { 
+            0% { transform: scale(1); opacity: 0.9; } 
+            50% { transform: scale(1.05); opacity: 1; } 
+            100% { transform: scale(1); opacity: 0.9; } 
+        }
+
+        #report { padding: 20px; }
+        .final-score-val { font-size: 6rem; font-weight: 900; margin: 15px 0; }
+        .restart-btn {
+            width: 100%; 
+            padding: 22px; 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        @media (max-height: 650px) {
+            .app-container { height: 98vh; padding: 10px 5px; }
+            .digit { font-size: 3rem; }
+            .digit-input { height: 75px; font-size: 2.5rem; line-height: 75px; }
+            .v-line { margin: 10px 0; }
+            .instruction-note { font-size: 0.9rem; padding: 5px; margin-bottom: 10px; }
+            .side-watermark { font-size: 0.8rem; width: 30px; }
+            .carry-cell { height: 35px; }
+            .carry-box { width: 30px; height: 30px; font-size: 1.2rem; }
+        }
+
+        @media (max-width: 400px) {
+            .app-container { padding: 15px 10px; border-width: 5px; }
+            .math-grid { grid-template-columns: repeat(3, 1fr) 40px; gap: 3px; }
+            .digit-input { height: clamp(70px, 20vw, 100px); font-size: clamp(2.5rem, 12vw, 3.5rem); }
+            .label { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body onclick="initAudioContext()">
+
+    <div class="app-container" id="main-container">
+        <div class="side-watermark wm-left">
+            <div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div>
+        </div>
+        <div class="side-watermark wm-right">
+            <div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div>
+        </div>
+
+        <div class="quiz-content">
+            <div id="quiz-part">
+                <div id="progress">السؤال ١ من ١٥</div>
+                <div id="note" class="instruction-note">💡 يا بطل، ابدأ بالحل في ورقتك أولاً، ثم اكتب الجواب النهائي هنا.</div>
+                
+                <div class="math-grid">
+                    <div class="label lbl-h">مئات</div><div class="label lbl-t">عشرات</div><div class="label lbl-o">آحاد</div><div></div>
+                    
+                    <!-- صف الحمل -->
+                    <div></div>
+                    <div class="carry-cell">
+                        <div id="carry-box" class="carry-box">١</div>
+                    </div>
+                    <div></div>
+                    <div></div>
+
+                    <!-- الصف العلوي -->
+                    <div class="digit h-digit" id="n1-h">٠</div>
+                    <div class="digit t-digit" id="n1-t">٠</div>
+                    <div class="digit o-digit" id="n1-o">٠</div>
+                    <div></div>
+                    
+                    <!-- الصف السفلي -->
+                    <div class="digit h-digit" id="n2-h">٠</div>
+                    <div class="digit t-digit" id="n2-t">٠</div>
+                    <div class="digit o-digit" id="n2-o">٠</div>
+                    <div class="sign">+</div>
+                    
+                    <!-- الخط الفاصل -->
+                    <div class="v-line"></div>
+                    
+                    <!-- صف المدخلات (الناتج) -->
+                    <div class="input-cell">
+                        <input type="text" id="input-hundreds" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
+                    </div>
+                    <div class="input-cell">
+                        <input type="text" id="input-tens" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
+                    </div>
+                    <div class="input-cell">
+                        <input type="text" id="input-ones" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
+                    </div>
+                    <div></div>
+                </div>
+
+                <div id="hint-area"></div>
+            </div>
+
+            <div id="report" style="display:none;">
+                <h2 style="color: var(--primary); font-size: 2.5rem;">النتيجة النهائية</h2>
+                <div id="final-score" class="final-score-val"></div>
+                <div id="feedback-msg" style="font-size: 1.8rem; margin-bottom: 35px; font-weight: bold;"></div>
+                <button class="restart-btn" onclick="location.reload()">إعادة الاختبار</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let counter = 0, score = 0, isWaiting = false;
+        const totalQuestions = 15;
+        const hindiDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+        let audioCtx = null;
+        let currentQuestion = null;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const buffer = audioCtx.createBuffer(1, 1, 22050);
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+            }
+            if (isWaiting) { isWaiting = false; nextQuest(); }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            if (type === 'success') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else {
+                [0, 0.1, 0.2].forEach(delay => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'square'; osc.frequency.setValueAtTime(150, now + delay);
+                    gain.gain.setValueAtTime(0.1, now + delay); gain.gain.linearRampToValueAtTime(0.01, now + delay + 0.1);
+                    osc.start(now + delay); osc.stop(now + delay + 0.1);
+                });
+            }
+        }
+
+        function speak(txt) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const m = new SpeechSynthesisUtterance(txt);
+                m.lang = 'ar-SA';
+                window.speechSynthesis.speak(m);
+            }
+        }
+
+        function setupInputs() {
+            const h = document.getElementById('input-hundreds'), 
+                  t = document.getElementById('input-tens'), 
+                  o = document.getElementById('input-ones');
+            
+            const inputs = [o, t, h];
+            
+            // معالج الآحاد
+            o.addEventListener('input', () => {
+                let normalized = o.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
+                if (normalized.length > 0) {
+                    o.value = hindiDigits[normalized.slice(-1)];
+                    const userOnes = parseInt(normalized.slice(-1));
+                    const correctOnes = currentQuestion.ans % 10;
+                    
+                    if (userOnes === correctOnes) {
+                        // حساب الحمل من الآحاد
+                        const n1Ones = currentQuestion.n1 % 10;
+                        const n2Ones = currentQuestion.n2 % 10;
+                        const carry = Math.floor((n1Ones + n2Ones) / 10);
+                        
+                        if (carry > 0) {
+                            document.getElementById('carry-box').innerText = toH(carry);
+                            document.getElementById('carry-box').classList.add('show');
+                        } else {
+                            document.getElementById('carry-box').classList.remove('show');
+                        }
+                        
+                        // الانتقال مباشرة للعشرات مع تأخير بسيط لضمان ظهور الرقم
+                        setTimeout(() => {
+                            t.focus();
+                            t.value = '';
+                        }, 350);
+                    } else {
+                        document.getElementById('carry-box').classList.remove('show');
+                        setTimeout(() => o.focus(), 100);
+                    }
+                }
+            });
+            
+            // معالج العشرات
+            t.addEventListener('input', () => {
+                let normalized = t.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
+                if (normalized.length > 0) {
+                    t.value = hindiDigits[normalized.slice(-1)];
+                    const userTens = parseInt(normalized.slice(-1));
+                    const correctTens = Math.floor((currentQuestion.ans % 100) / 10);
+                    
+                    if (userTens === correctTens) {
+                        setTimeout(() => {
+                            h.focus();
+                            h.value = '';
+                        }, 350);
+                    } else {
+                        setTimeout(() => t.focus(), 150);
+                    }
+                }
+            });
+            
+            // معالج المئات
+            h.addEventListener('input', () => {
+                let normalized = h.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
+                if (normalized.length > 0) {
+                    h.value = hindiDigits[normalized.slice(-1)];
+                    h.blur();
+                    setTimeout(check, 400);
+                }
+            });
+            
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => { 
+                    if (!isWaiting) input.value = ""; 
+                });
+            });
+        }
+
+        function generate() {
+            let n1_o = Math.floor(Math.random() * 6) + 4; 
+            let n2_o = Math.floor(Math.random() * 6) + 4; 
+            let n1_t = Math.floor(Math.random() * 7) + 1;
+            let n2_t = Math.floor(Math.random() * (8 - n1_t));
+            let n1_h = Math.floor(Math.random() * 4) + 1;
+            let n2_h = Math.floor(Math.random() * 4) + 1;
+            let n1 = n1_h * 100 + n1_t * 10 + n1_o;
+            let n2 = n2_h * 100 + n2_t * 10 + n2_o;
+            return { n1, n2, ans: n1 + n2 };
+        }
+
+        const questions = Array.from({length: totalQuestions}, generate);
+
+        function load() {
+            if (counter >= totalQuestions) { finish(); return; }
+            currentQuestion = questions[counter];
+            const q = currentQuestion;
+            const d1 = q.n1.toString().padStart(3,'0').split(''), d2 = q.n2.toString().padStart(3,'0').split('');
+            
+            document.getElementById('n1-h').innerText = toH(d1[0]); 
+            document.getElementById('n1-t').innerText = toH(d1[1]); 
+            document.getElementById('n1-o').innerText = toH(d1[2]);
+            document.getElementById('n2-h').innerText = toH(d2[0]); 
+            document.getElementById('n2-t').innerText = toH(d2[1]); 
+            document.getElementById('n2-o').innerText = toH(d2[2]);
+            document.getElementById('progress').innerText = `السؤال ${toH(counter+1)} من ${toH(totalQuestions)}`;
+            document.getElementById('note').style.display = counter === 0 ? "block" : "none";
+            
+            document.querySelectorAll('.digit-input').forEach(i => { 
+                i.value = ""; 
+                i.classList.remove('correct-box', 'wrong-box'); 
+                i.disabled = false; 
+            });
+            
+            document.getElementById('carry-box').classList.remove('show');
+            document.getElementById('hint-area').innerHTML = "";
+            
+            setTimeout(() => document.getElementById('input-ones').focus(), 500);
+        }
+
+        function check() {
+            const hVal = document.getElementById('input-hundreds').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
+            const tVal = document.getElementById('input-tens').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
+            const oVal = document.getElementById('input-ones').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
+            
+            if (hVal === "" || tVal === "" || oVal === "") return;
+            
+            const userAns = parseInt(hVal + tVal + oVal), q = currentQuestion;
+            if (userAns === q.ans) {
+                score++; 
+                playSound('success');
+                document.querySelectorAll('.digit-input').forEach(i => i.classList.add('correct-box'));
+                speak("بطل! إجابة صحيحة");
+                setTimeout(nextQuest, 1200);
+            } else {
+                playSound('error');
+                showCorrect(q);
+            }
+        }
+
+        function showCorrect(q) {
+            const res = q.ans.toString().padStart(3,'0').split('');
+            document.getElementById('input-hundreds').value = toH(res[res.length-3] || 0);
+            document.getElementById('input-tens').value = toH(res[res.length-2]);
+            document.getElementById('input-ones').value = toH(res[res.length-1]);
+            document.querySelectorAll('.digit-input').forEach(i => { 
+                i.classList.add('wrong-box'); 
+                i.disabled = true; 
+            });
+            document.getElementById('hint-area').innerHTML = `<span class='error-hint'>انتبه لإعادة التجميع!</span><div class='click-prompt' onclick='initAudioContext()'>المس هنا للاستمرار</div>`;
+            isWaiting = true;
+        }
+
+        function nextQuest() { 
+            counter++; 
+            load(); 
+        }
+
+        function finish() {
+            document.getElementById('quiz-part').style.display = 'none';
+            document.getElementById('report').style.display = 'block';
+            const p = Math.round((score / totalQuestions) * 100);
+            document.getElementById('final-score').innerText = `%${toH(p)}`;
+            document.getElementById('final-score').style.color = p >= 90 ? "var(--success)" : "var(--error)";
+            document.getElementById('feedback-msg').innerText = p >= 95 ? "ممتاز يا بطل! أتقنت مهارة إعادة التجميع" : "راجع مهارة إعادة التجميع وحاول مرة أخرى";
+            speak(document.getElementById('feedback-msg').innerText);
+        }
+
+        function toH(n) { 
+            return n.toString().replace(/\d/g, d => hindiDigits[d]); 
+        }
+
+        window.onload = () => { 
+            setupInputs(); 
+            load(); 
+        };
+    </script>
+</body>
+</html>
