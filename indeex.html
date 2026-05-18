@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المعلم أحمد فتحي أبوجبل</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --box-size: 70px; /* تكبير المربعات بشكل ملحوظ */
+            --primary-color: #0033aa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4ebd0 0%, #ece0c1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+            padding: 10px;
+        }
+
+        /* --- تأثير العلامة المائية --- */
+        .watermark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            justify-items: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .watermark-item {
+            color: rgba(197, 160, 89, 0.13); 
+            font-size: 26px;
+            font-weight: bold;
+            white-space: nowrap;
+            transform: rotate(-25deg);
+            user-select: none;
+            animation: glowFade 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowFade {
+            0% { color: rgba(197, 160, 89, 0.05); text-shadow: none; }
+            50% { color: rgba(212, 175, 55, 0.22); text-shadow: 0 0 12px rgba(255, 215, 0, 0.2); }
+            100% { color: rgba(197, 160, 89, 0.05); text-shadow: none; }
+        }
+
+        /* --- واجهة الاختيار الرئيسية --- */
+        .selection-screen {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(92, 77, 46, 0.2);
+            text-align: center;
+            max-width: 650px;
+            width: 100%;
+            z-index: 10;
+            border: 3px solid #e6dcbe;
+        }
+
+        .selection-screen h1 { color: var(--primary-color); margin-top: 0; font-size: 32px; margin-bottom: 5px; }
+        .selection-screen h2 { color: #6e5d3b; font-size: 20px; font-weight: 500; margin-bottom: 35px; }
+
+        .cards-container { display: flex; gap: 20px; justify-content: center; }
+
+        .mode-card {
+            background: #faf8f2;
+            border: 3px solid #dcd1b3;
+            border-radius: 20px;
+            padding: 30px 20px;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            background-color: #f3f7ff;
+        }
+
+        .mode-card .icon-placeholder {
+            width: 80px; height: 80px; background: #ffffff; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 36px; font-weight: bold; color: var(--primary-color);
+            border: 2px solid #e6dcbe;
+        }
+        
+        .mode-card.hindi-card:hover { border-color: #2b8a3e; background-color: #f4fbf5; }
+        .mode-card.hindi-card .icon-placeholder { color: #2b8a3e; }
+        .mode-card span { font-size: 18px; font-weight: bold; }
+
+        /* --- الهيكل الرئيسي المرن --- */
+        .main-wrapper {
+            display: none;
+            align-items: stretch;
+            justify-content: center;
+            gap: 15px;
+            z-index: 10;
+            max-width: 1300px; 
+            width: 100%;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(92, 77, 46, 0.15);
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* شريط الأرقام المدمج والمقرب جهة اليسار */
+        .side-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(92, 77, 46, 0.1);
+            border: 2px solid #e6dcbe;
+            width: 140px; /* عرض مدمج ومناسب للوضع اليساري */
+            flex-shrink: 0;
+            justify-content: center;
+        }
+
+        .keyboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .num-btn {
+            height: 55px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #faf8f2;
+            border: 2px solid #dcd1b3;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .num-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .num-btn:active { transform: scale(0.92); }
+
+        .btn-clear-box {
+            grid-column: span 2;
+            background-color: #ffe3e3;
+            border-color: #ffa8a8;
+            color: #e03131;
+            font-size: 18px;
+            height: 50px;
+        }
+        .btn-clear-box:hover { background-color: #e03131; color: white; border-color: #e03131; }
+
+        .header-title-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .header-title-area h2 { color: var(--primary-color); margin: 0; font-size: 28px; }
+        
+        .btn-back-home {
+            background-color: #f1f3f5; color: #495057; border: 2px solid #ced4da;
+            padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+
+        .badge-info {
+            background-color: #e3fafc; color: #0b7285;
+            padding: 6px 20px; border-radius: 20px;
+            font-weight: bold; font-size: 20px; display: inline-block; margin-bottom: 15px;
+        }
+
+        .division-grid {
+            display: grid;
+            grid-gap: 12px 8px;
+            justify-content: center;
+            margin: 20px auto;
+            direction: ltr; 
+        }
+
+        /* تكبير حجم الخط داخل المربعات */
+        .box {
+            width: var(--box-size); 
+            height: var(--box-size);
+            text-align: center; font-size: 32px; font-weight: bold;
+            border: 3.5px solid #bdcbd7; border-radius: 14px;
+            outline: none; box-sizing: border-box;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            box-shadow: none;
+        }
+        .box:focus { border-color: var(--primary-color); background-color: #f3f7ff; box-shadow: 0 0 10px rgba(0,51,170,0.3); }
+
+        .divisor-box { background-color: #ffe3e3; border-color: #ffa8a8; color: #e03131; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .dividend-box { background-color: #f3f0ff; border-color: #d0bfff; color: #6741d9; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .bring-down-box { background-color: #e3fafc; border-color: #99e9f2; color: #0b7285; }
+        
+        .disabled-box { background-color: #e9ecef !important; border-color: #dee2e6 !important; color: #adb5bd !important; cursor: not-allowed; }
+        .box.correct { background-color: #d3f9d8 !important; border-color: #2b8a3e !important; color: #2b8a3e !important; }
+        .box.incorrect { background-color: #fff0f6 !important; border-color: #e03131 !important; color: #e03131 !important; }
+
+        .active-dividend-target {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 15px rgba(0, 51, 170, 0.4);
+            animation: tiltStep 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes tiltStep { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+
+        .main-division-line { border-top: 5px solid #3b5bdb; margin-top: -6px; height: 0; }
+        .sub-minus-line { border-top: 5px solid #c92a2a; margin-top: -6px; height: 0; }
+        .minus-sign { color: #e03131; font-size: 36px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+
+        .buttons-container { margin-top: 20px; display: flex; justify-content: center; gap: 15px; min-height: 55px; }
+        .btn { padding: 12px 40px; font-size: 22px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+        .btn-check { background-color: #2b8a3e; color: white; }
+        .btn-next { background-color: var(--primary-color); color: white; display: none; }
+
+        .score-screen { display: none; padding: 40px 20px; }
+        .score-screen h3 { color: #2b8a3e; font-size: 36px; }
+        .score-screen p { font-size: 24px; color: #495057; }
+
+        /* مواءمة الشاشات المتجاوبة لجعل الكيبورد دائماً في مكان مثالي */
+        @media (max-width: 900px) {
+            :root { --box-size: 55px; }
+            .box, .divisor-box, .dividend-box { font-size: 26px; border-radius: 10px; }
+            .side-bar { width: 110px; padding: 8px; }
+            .num-btn { height: 45px; font-size: 20px; }
+            .btn-clear-box { font-size: 15px; height: 40px; }
+        }
+
+        @media (max-width: 600px) {
+            .main-wrapper { flex-direction: column-reverse; align-items: center; }
+            .side-bar { width: 100%; max-width: 340px; }
+            .keyboard-grid { grid-template-columns: repeat(5, 1fr); }
+            .btn-clear-box { grid-column: span 5; }
+            :root { --box-size: 46px; }
+            .box, .divisor-box, .dividend-box { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="watermark-container">
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+</div>
+
+<div id="selectionScreen" class="selection-screen">
+    <h1>المعلم أحمد فتحي أبوجبل</h1>
+    <h2>منصة التميز الذكية للقسمة المطولة</h2>
+    
+    <div class="cards-container">
+        <div class="mode-card" onclick="launchPlatform('en')">
+            <div class="icon-placeholder">123</div>
+            <span>الأرقام الإنجليزية</span>
+        </div>
+        <div class="mode-card hindi-card" onclick="launchPlatform('hi')">
+            <div class="icon-placeholder">١٢٣</div>
+            <span>الأرقام العربية (الهندية)</span>
+        </div>
+    </div>
+</div>
+
+<div id="mainWrapper" class="main-wrapper">
+    <div class="side-bar" id="unifiedSidebar">
+        <div class="keyboard-grid" id="keyboardGrid"></div>
+    </div>
+
+    <div class="container">
+        <div id="quizInterface">
+            <div class="header-title-area">
+                <h2>المعلم أحمد فتحي أبوجبل</h2>
+                <button class="btn-back-home" onclick="backToHome()">🏠 تغيير النظام</button>
+            </div>
+            <div id="questionBadge" class="badge-info">السؤال 1 من 10</div>
+            
+            <div id="divisionPlatform" class="division-grid"></div>
+
+            <div class="buttons-container">
+                <button id="btnCheck" onclick="checkAnswers()" class="btn btn-check">التحقق من الإجابة</button>
+                <button id="btnNext" onclick="nextQuestion()" class="btn btn-next">السؤال التالي ←</button>
+            </div>
+        </div>
+
+        <div id="scoreScreen" class="score-screen">
+            <h3>🎉 رائع جداً، لقد انتهى الاختبار!</h3>
+            <p id="scoreText">لقد قمت بحل الـ 10 أسئلة كاملة بنجاح وتجاوزت تحديات القسمة المطولة بامتياز.</p>
+            <button onclick="startNewSession()" class="btn btn-next" style="display:inline-block;">بدء اختبار جديد</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selectionScreen = document.getElementById('selectionScreen');
+    const mainWrapper = document.getElementById('mainWrapper');
+    const platform = document.getElementById('divisionPlatform');
+    const badge = document.getElementById('questionBadge');
+    const btnCheck = document.getElementById('btnCheck');
+    const btnNext = document.getElementById('btnNext');
+    const quizInterface = document.getElementById('quizInterface');
+    const scoreScreen = document.getElementById('scoreScreen');
+    const scoreText = document.getElementById('scoreText');
+
+    let currentMode = 'en'; 
+    let questionsPool = [];
+    let currentQuestionIndex = 0;
+    let lastFocusedInput = null;
+    let activeInputsSequence = []; 
+    let dividendLength = 0; 
+    let globalDivisor = 1; 
+    let globalDividendStr = ""; 
+    let zeroSkipTriggers = {}; 
+
+    function formatDigit(num) {
+        if (num === null || num === undefined) return '';
+        if (currentMode === 'en') return num.toString();
+        const hindiDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        return num.toString().replace(/[0-9]/g, w => hindiDigits[+w]);
+    }
+
+    function launchPlatform(mode) {
+        currentMode = mode;
+        selectionScreen.style.display = 'none';
+        mainWrapper.style.display = 'flex';
+        buildSidebarHTML();
+        startNewSession();
+    }
+
+    function backToHome() {
+        mainWrapper.style.display = 'none';
+        selectionScreen.style.display = 'block';
+    }
+
+    // بناء كيبورد موحد يحتوي على كافة الأرقام مرتبة تصاعدياً لسهولة الاستخدام
+    function buildSidebarHTML() {
+        const grid = document.getElementById('keyboardGrid');
+        const digitsOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+        
+        let html = digitsOrder.map(n => 
+            `<button class="num-btn" onclick="pressNumber('${formatDigit(n)}')">${formatDigit(n)}</button>`
+        ).join('');
+        
+        html += `<button class="num-btn btn-clear-box" onclick="pressClear()">مسح الكل</button>`;
+        grid.innerHTML = html;
+    }
+
+    function startNewSession() {
+        questionsPool = [];
+        currentQuestionIndex = 0;
+        quizInterface.style.display = 'block';
+        scoreScreen.style.display = 'none';
+        lastFocusedInput = null;
+
+        let c1 = 0;
+        while(c1 < 7) {
+            let divisor = Math.floor(Math.random() * 8) + 2; 
+            let dividend = Math.floor(Math.random() * 8999) + 1000; 
+            let shouldBeExact = (c1 < 4);
+            if (shouldBeExact) dividend = dividend - (dividend % divisor);
+            else if (dividend % divisor === 0) dividend += Math.floor(Math.random() * (divisor - 1)) + 1;
+
+            if (dividend >= 1000 && dividend <= 9999) {
+                if(!questionsPool.some(q => q.dividend === dividend && q.divisor === divisor)) {
+                    questionsPool.push({ divisor, dividend });
+                    c1++;
+                }
+            }
+        }
+
+        let c2 = 0;
+        while(c2 < 3) {
+            let divisor = Math.floor(Math.random() * 85) + 11; 
+            if (divisor % 10 === 0) continue;
+            let dividend = Math.floor(Math.random() * 8999) + 1000;
+            let shouldBeExact = (c2 < 1);
+            if (shouldBeExact) dividend = dividend - (dividend % divisor);
+            else if (dividend % divisor === 0) dividend += Math.floor(Math.random() * (divisor - 1)) + 1;
+
+            if (dividend >= 1000 && dividend <= 9999) {
+                if(!questionsPool.some(q => q.dividend === dividend && q.divisor === divisor)) {
+                    questionsPool.push({ divisor, dividend });
+                    c2++;
+                }
+            }
+        }
+
+        questionsPool.sort(() => Math.random() - 0.5);
+        loadCurrentQuestion();
+    }
+
+    function loadCurrentQuestion() {
+        btnNext.style.display = 'none';
+        btnCheck.style.display = 'inline-block';
+        badge.innerText = `السؤال ${formatDigit(currentQuestionIndex + 1)} من ${formatDigit(10)}`;
+        zeroSkipTriggers = {};
+
+        const currentQuestion = questionsPool[currentQuestionIndex];
+        const divisor = currentQuestion.divisor;
+        const dividendStr = currentQuestion.dividend.toString();
+        dividendLength = dividendStr.length;
+        globalDivisor = divisor;
+        globalDividendStr = dividendStr;
+
+        const totalColumns = dividendStr.length + 3; 
+        platform.style.gridTemplateColumns = `repeat(${totalColumns}, var(--box-size))`; 
+
+        let quotientRowHTML = '';
+        let stepBlocks = []; 
+        let quotientData = [];
+        let tempRem = 0;
+        let nonZeroFound = false;
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let val = tempRem * 10 + parseInt(dividendStr[i]);
+            let q = Math.floor(val / divisor);
+            if (q > 0) nonZeroFound = true;
+            quotientData.push({ value: q, isLeadingZero: !nonZeroFound && q === 0 });
+            tempRem = val % divisor;
+        }
+
+        let zeroChar = formatDigit(0);
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let qInfo = quotientData[i];
+            let col = 4 + i;
+            let id = `q-${i}`;
+            if (qInfo.isLeadingZero) {
+                quotientRowHTML += `<input type="text" id="${id}" class="box disabled-box" data-ans="${zeroChar}" value="-" disabled style="grid-column: ${col}; grid-row: 1;">`;
+            } else {
+                quotientRowHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(qInfo.value)}" style="grid-column: ${col}; grid-row: 1;" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+            }
+        }
+
+        let staticRowHTML = '';
+        if (divisor < 10) {
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 2; grid-row: 2;">${formatDigit(divisor)}</div>`;
+        } else {
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 1; grid-row: 2;">${formatDigit(Math.floor(divisor/10))}</div>`;
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 2; grid-row: 2;">${formatDigit(divisor%10)}</div>`;
+        }
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            staticRowHTML += `<div id="dividend-digit-${i}" class="box dividend-box" style="grid-column: ${4 + i}; grid-row: 2;">${formatDigit(dividendStr[i])}</div>`;
+        }
+        staticRowHTML += `<div class="main-division-line" style="grid-column: 3 / span ${dividendStr.length + 1}; grid-row: 2; align-self: end;"></div>`;
+
+        let currentRow = 3;
+        let runningVal = 0;
+        let hasSubtractedYet = false;
+        let accumulatedCarryRowOffset = 0;
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let col = 4 + i;
+            let digit = parseInt(dividendStr[i]);
+            runningVal = runningVal * 10 + digit;
+            let q = quotientData[i].value;
+
+            if (quotientData[i].isLeadingZero) continue; 
+
+            let blockHTML = '';
+            let blockInputs = [];
+            let isZeroStep = (q === 0);
+
+            if (hasSubtractedYet) {
+                let id = `down-${i}`;
+                let rowTarget = currentRow - 1 - accumulatedCarryRowOffset;
+                blockHTML += `<input type="text" id="${id}" class="box bring-down-box" data-ans="${formatDigit(digit)}" style="grid-column: ${col}; grid-row: ${rowTarget};" maxlength="1" placeholder="↓" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                blockInputs.push(id);
+            }
+
+            let prod = q * divisor;
+            let nextRem = runningVal - prod;
+            let prodStr = prod.toString();
+            let localProdIds = [];
+            let localRemIds = [];
+            let maxLen = Math.max(runningVal.toString().length, prodStr.length);
+
+            if (isZeroStep && i < dividendStr.length - 1) {
+                zeroSkipTriggers[`q-${i}`] = { nextTargetId: `down-${i+1}`, clearIds: [] };
+                accumulatedCarryRowOffset += 2; 
+            } else {
+                blockHTML += `<div class="minus-sign" style="grid-column: 3; grid-row: ${currentRow - accumulatedCarryRowOffset};">-</div>`;
+
+                for (let p = 0; p < maxLen; p++) {
+                    let pDigit = (p < prodStr.length) ? prodStr[prodStr.length - 1 - p] : '0';
+                    let id = `prod-${i}-${p}`;
+                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(pDigit)}" style="grid-column: ${col - p}; grid-row: ${currentRow - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                    localProdIds.push(id); 
+                }
+                blockInputs.push(...localProdIds);
+                
+                let startCol = col - maxLen + 1;
+                blockHTML += `<div class="sub-minus-line" style="grid-column: ${startCol} / span ${maxLen}; grid-row: ${currentRow - accumulatedCarryRowOffset}; align-self: end;"></div>`;
+
+                let remStr = nextRem.toString().padStart(maxLen, '0');
+                
+                for (let r = maxLen - 1; r >= 0; r--) {
+                    let rDigit = remStr[r];
+                    let rCol = col - maxLen + 1 + r;
+                    let id = `rem-${i}-${r}`;
+                    
+                    if (rDigit === '0') {
+                        let isLeftZero = true;
+                        for (let k = 0; k < r; k++) {
+                            if (remStr[k] !== '0') { isLeftZero = false; break; }
+                        }
+                        if (isLeftZero) {
+                            if (r === remStr.length - 1) {
+                                blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                localRemIds.push(id);
+                            } else {
+                                if (remStr[r+1] === '0') {
+                                    blockHTML += `<div style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};"></div>`;
+                                } else {
+                                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                    localRemIds.push(id);
+                                }
+                            }
+                        } else {
+                            blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                            localRemIds.push(id);
+                        }
+                    } else {
+                        blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                        localRemIds.push(id);
+                    }
+                }
+                blockInputs.push(...localRemIds);
+                
+                if (isZeroStep) {
+                    zeroSkipTriggers[`q-${i}`] = { nextTargetId: null, clearIds: [...localProdIds, ...localRemIds] };
+                }
+            }
+
+            runningVal = nextRem;
+            hasSubtractedYet = true;
+            currentRow += 2; 
+
+            stepBlocks.push({
+                index: i, html: blockHTML, inputs: blockInputs,
+                hasQuotient: !quotientData[i].isLeadingZero,
+                localProdCount: localProdIds.length, localRemCount: localRemIds.length, isZeroStep: isZeroStep
+            });
+        }
+
+        activeInputsSequence = [];
+        let finalGridHTML = quotientRowHTML + staticRowHTML;
+
+        stepBlocks.forEach(block => {
+            finalGridHTML += block.html;
+            let idx = 0;
+            if (block.inputs.length > 0 && block.inputs[0].startsWith('down-')) activeInputsSequence.push(block.inputs[idx++]);
+            if (block.hasQuotient) activeInputsSequence.push(`q-${block.index}`);
+            if (!block.isZeroStep || block.index === dividendStr.length - 1) {
+                for (let p = 0; p < block.localProdCount; p++) activeInputsSequence.push(block.inputs[idx++]);
+                for (let r = 0; r < block.localRemCount; r++) activeInputsSequence.push(block.inputs[idx++]);
+            }
+        });
+
+        platform.innerHTML = finalGridHTML;
+        
+        activeInputsSequence = activeInputsSequence.filter(id => {
+            let el = document.getElementById(id);
+            return el && !el.disabled;
+        });
+
+        // تفعيل خاصية إلغاء كيبورد الجوال لجميع المربعات المضافة حديثاً
+        platform.querySelectorAll('input').forEach(input => {
+            input.setAttribute('inputmode', 'none');
+        });
+
+        setTimeout(() => {
+            if(activeInputsSequence.length > 0) {
+                let firstInput = document.getElementById(activeInputsSequence[0]);
+                if(firstInput) firstInput.focus();
+            }
+            updateVisualWobble(); 
+        }, 50);
+    }
+
+    function trackFocus(inputElement) {
+        lastFocusedInput = inputElement;
+        updateVisualWobble(); 
+    }
+
+    function updateVisualWobble() {
+        for (let i = 0; i < dividendLength; i++) {
+            let digitBox = document.getElementById(`dividend-digit-${i}`);
+            if (digitBox) digitBox.classList.remove('active-dividend-target');
+        }
+
+        if (!lastFocusedInput) return;
+
+        let idParts = lastFocusedInput.id.split('-');
+        let stepIndex = parseInt(idParts[1]);
+
+        if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < dividendLength) {
+            let firstDigitVal = parseInt(globalDividendStr[0]);
+            if (firstDigitVal < globalDivisor) {
+                if (stepIndex === 0 || stepIndex === 1) {
+                    let digit0 = document.getElementById(`dividend-digit-0`);
+                    let digit1 = document.getElementById(`dividend-digit-1`);
+                    if (digit0) digit0.classList.add('active-dividend-target');
+                    if (digit1) digit1.classList.add('active-dividend-target');
+                    return;
+                }
+            }
+            let activeDigit = document.getElementById(`dividend-digit-${stepIndex}`);
+            if (activeDigit) activeDigit.classList.add('active-dividend-target');
+        }
+    }
+
+    function handleAutoAdvance() {
+        if (!lastFocusedInput) return;
+        
+        let zeroChar = formatDigit(0);
+        if (lastFocusedInput.id.startsWith('q-') && lastFocusedInput.value === zeroChar) {
+            let trigger = zeroSkipTriggers[lastFocusedInput.id];
+            if (trigger && trigger.nextTargetId) {
+                let nextTargetBox = document.getElementById(trigger.nextTargetId);
+                if (nextTargetBox) {
+                    setTimeout(() => { nextTargetBox.focus(); }, 100);
+                    updateVisualWobble();
+                    return;
+                }
+            }
+        }
+
+        if (lastFocusedInput.value.length >= 1) {
+            let currentIndex = activeInputsSequence.indexOf(lastFocusedInput.id);
+            if (currentIndex !== -1 && currentIndex < activeInputsSequence.length - 1) {
+                let nextInput = document.getElementById(activeInputsSequence[currentIndex + 1]);
+                if (nextInput) nextInput.focus();
+            }
+        }
+        updateVisualWobble(); 
+    }
+
+    function pressNumber(num) {
+        if (lastFocusedInput && !lastFocusedInput.disabled) {
+            lastFocusedInput.value = num;
+            handleAutoAdvance();
+        }
+    }
+
+    function pressClear() {
+        if (lastFocusedInput && !lastFocusedInput.disabled) {
+            lastFocusedInput.value = '';
+        }
+    }
+
+    function checkAnswers() {
+        for (let i = 0; i < dividendLength; i++) {
+            let digitBox = document.getElementById(`dividend-digit-${i}`);
+            if (digitBox) digitBox.classList.remove('active-dividend-target');
+        }
+
+        let zeroChar = formatDigit(0);
+        const inputs = platform.querySelectorAll('input:not([disabled])');
+        
+        inputs.forEach(input => {
+            const userAnswer = input.value.trim();
+            const correctAnswer = input.getAttribute('data-ans');
+            const isLeftZero = input.getAttribute('data-is-left-zero') === 'true';
+
+            if (isLeftZero && correctAnswer === zeroChar && (userAnswer === zeroChar || userAnswer === '')) {
+                input.classList.add('correct');
+                if (userAnswer === '') input.value = zeroChar; 
+            } 
+            else if (userAnswer === correctAnswer || (correctAnswer === zeroChar && userAnswer === '')) {
+                input.classList.add('correct');
+                if (userAnswer === '') input.value = zeroChar;
+            } else {
+                input.classList.add('incorrect');
+                input.value = correctAnswer; 
+            }
+        });
+
+        btnCheck.style.display = 'none';
+        btnNext.style.display = 'inline-block';
+        if (currentQuestionIndex === 9) btnNext.innerText = "عرض النتيجة النهائية 📊";
+        else btnNext.innerText = "السؤال التالي ←";
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < 9) {
+            currentQuestionIndex++;
+            loadCurrentQuestion();
+        } else {
+            quizInterface.style.display = 'none';
+            scoreScreen.style.display = 'block';
+            scoreText.innerText = `لقد قمت بحل الـ ${formatDigit(10)} أسئلة كاملة بنجاح وتجاوزت تحديات القسمة المطولة بامتياز.`;
+        }
+    }
+</script>
+
+</body>
+</html>
