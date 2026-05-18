@@ -1,545 +1,880 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>منصة الأستاذ أحمد أبو جبل التعليمية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المعلم أحمد فتحي أبوجبل</title>
     <style>
-        :root { 
-            --sand-bg: #F5F5DC; 
-            --primary: #2c3e50; 
-            --error: #e74c3c; 
-            --success: #27ae60; 
-            --ones-color: #e74c3c; 
-            --tens-color: #27ae60; 
-            --hundreds-color: #2980b9;
-            --gold-wm: rgba(212, 175, 55, 0.25); 
+        /* إعادة تعيين شاملة لضمان التوافق التام مع هواتف الآيفون والشاشات الذكية */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* إلغاء التحديد الرمادي التلقائي في الآيفون */
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation; 
-            -webkit-user-select: none;
-            user-select: none;
+        :root {
+            --box-size: 55px; /* حجم افتراضي للمربعات يتغير ديناميكياً حسب حجم الشاشة */
+            --primary-color: #0033aa;
         }
 
-        input {
-            -webkit-user-select: auto;
-            user-select: auto;
-        }
-
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--sand-bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            min-height: 100dvh;
-            margin: 0; 
-            padding: 10px; 
-            overflow: hidden; 
-        }
-        
-        .app-container { 
-            width: 100%; 
-            max-width: 500px; 
-            background: white; 
-            padding: 20px 15px; 
-            border-radius: 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-            text-align: center; 
-            border: 8px solid var(--primary); 
-            position: relative; 
-            overflow: hidden; 
-            height: 92vh; 
-            height: 92dvh;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between;
-        }
-
-        .side-watermark {
-            position: absolute; top: 0; bottom: 0; width: 40px;
-            display: flex; flex-direction: column; justify-content: space-around;
-            align-items: center; font-size: 1.1rem; font-weight: 900; 
-            color: var(--gold-wm); pointer-events: none; z-index: 1;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
-        }
-        .wm-left { left: 5px; } 
-        .wm-right { right: 5px; }
-        .wm-text { transform: rotate(-90deg); white-space: nowrap; margin: 15px 0; }
-
-        .quiz-content { 
-            position: relative; 
-            z-index: 3; 
-            width: 100%; 
-            flex-grow: 1;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4ebd0 0%, #ece0c1 100%);
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            overflow-y: auto;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+            padding: 15px;
         }
-        
-        .instruction-note {
-            background: #fff9c4;
-            border: 2px dashed #fbc02d;
-            padding: 10px;
-            border-radius: 15px;
-            font-size: 1.1rem;
+
+        /* --- تأثير العلامة المائية باسم أحمد فتحي أبوجبل --- */
+        .watermark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            justify-items: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .watermark-item {
+            color: rgba(197, 160, 89, 0.13); 
+            font-size: 26px;
             font-weight: bold;
-            color: #d32f2f;
-            margin-bottom: 15px;
+            white-space: nowrap;
+            transform: rotate(-25deg);
+            user-select: none;
+            animation: glowFade 5s ease-in-out infinite alternate;
         }
 
-        .math-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr) 50px; 
-            align-items: center; 
-            direction: ltr; 
-            margin: 15px auto;
-            max-width: 100%;
-            gap: 5px;
-            position: relative;
-        }
-        
-        .carry-cell {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 45px;
+        .watermark-container div:nth-child(2n) { animation-delay: 1.5s; }
+        .watermark-container div:nth-child(3n) { animation-delay: 3s; }
+
+        @keyframes glowFade {
+            0% { color: rgba(197, 160, 89, 0.05); text-shadow: none; }
+            50% { color: rgba(212, 175, 55, 0.22); text-shadow: 0 0 12px rgba(255, 215, 0, 0.2); }
+            100% { color: rgba(197, 160, 89, 0.05); text-shadow: none; }
         }
 
-        .carry-box {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--ones-color);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--ones-color);
-            background: #fff;
-            visibility: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .carry-box.show { visibility: visible; }
-        
-        .label { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
-        .lbl-h { color: var(--hundreds-color); } 
-        .lbl-t { color: var(--tens-color); } 
-        .lbl-o { color: var(--ones-color); }
-        
-        .digit { font-size: clamp(3.5rem, 18vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
-        .h-digit { color: var(--hundreds-color); } 
-        .t-digit { color: var(--tens-color); } 
-        .o-digit { color: var(--ones-color); }
-        
-        .sign { 
-            font-size: 3.5rem; 
-            color: var(--primary); 
-            font-weight: bold; 
-            grid-column: 4; 
-            grid-row: 4; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .v-line { 
-            grid-column: 1 / span 4; 
-            border-top: 8px solid var(--primary); 
-            margin: 15px 0; 
-            border-radius: 10px; 
-        }
-        
-        .input-cell { 
-            display: flex; 
-            justify-content: center; 
-            padding: 0 5px;
-            position: relative;
-        }
-        
-        .digit-input { 
-            width: 100%; 
-            height: clamp(85px, 25vw, 120px); 
-            font-size: clamp(3rem, 15vw, 4.5rem); 
-            font-weight: 900; 
-            text-align: center; 
-            border: 5px solid var(--primary); 
-            border-radius: 18px; 
-            outline: none; 
-            background: #fff; 
-            -webkit-appearance: none;
-            appearance: none;
-            color: var(--primary);
-            /* حلول لمشاكل الجوال */
-            line-height: normal;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            vertical-align: middle;
+        /* --- واجهة الاختيار الرئيسية البوابة الأولى --- */
+        .selection-screen {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(92, 77, 46, 0.2);
+            text-align: center;
+            max-width: 650px;
+            width: 100%;
+            z-index: 10;
+            border: 3px solid #e6dcbe;
+            transition: all 0.4s ease;
         }
 
-        .digit-input:focus { border-color: #3498db; background-color: #f7fbff; }
-        .correct-box { background: #e8f5e9 !important; border-color: var(--success) !important; color: var(--success) !important; }
-        .wrong-box { background: #ffebee !important; border-color: var(--error) !important; color: var(--error) !important; }
-
-        .error-hint { color: var(--error); font-size: 1.4rem; font-weight: bold; display: block; margin: 10px 0; }
-        .click-prompt { 
-            font-size: 1.2rem; 
-            color: white; 
-            background: var(--primary); 
-            padding: 15px 30px; 
-            border-radius: 50px; 
-            display: inline-block; 
-            margin-top: 10px;
-            animation: pulse 1.5s infinite; 
-            cursor: pointer;
+        .selection-screen h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 32px;
+            margin-bottom: 5px;
         }
-        
-        #progress { 
-            font-size: 1.4rem; 
-            font-weight: bold; 
-            color: #7f8c8d;
+
+        .selection-screen h2 {
+            color: #6e5d3b;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 35px;
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
             margin-bottom: 10px;
         }
 
-        #hint-area { min-height: 100px; }
-        
-        @keyframes pulse { 
-            0% { transform: scale(1); opacity: 0.9; } 
-            50% { transform: scale(1.05); opacity: 1; } 
-            100% { transform: scale(1); opacity: 0.9; } 
-        }
-
-        #report { padding: 20px; }
-        .final-score-val { font-size: 6rem; font-weight: 900; margin: 15px 0; }
-        .restart-btn {
-            width: 100%; 
-            padding: 22px; 
-            font-size: 1.8rem; 
-            font-weight: bold; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
+        .mode-card {
+            background: #faf8f2;
+            border: 3px solid #dcd1b3;
             border-radius: 20px;
+            padding: 30px 20px;
+            flex: 1;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
-        @media (max-height: 650px) {
-            .app-container { height: 98vh; padding: 10px 5px; }
-            .digit { font-size: 3rem; }
-            .digit-input { height: 75px; font-size: 2.5rem; line-height: 75px; }
-            .v-line { margin: 10px 0; }
-            .instruction-note { font-size: 0.9rem; padding: 5px; margin-bottom: 10px; }
-            .side-watermark { font-size: 0.8rem; width: 30px; }
-            .carry-cell { height: 35px; }
-            .carry-box { width: 30px; height: 30px; font-size: 1.2rem; }
+        .mode-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-color);
+            background-color: #f3f7ff;
+            box-shadow: 0 12px 25px rgba(0, 51, 170, 0.15);
         }
 
-        @media (max-width: 400px) {
-            .app-container { padding: 15px 10px; border-width: 5px; }
-            .math-grid { grid-template-columns: repeat(3, 1fr) 40px; gap: 3px; }
-            .digit-input { height: clamp(70px, 20vw, 100px); font-size: clamp(2.5rem, 12vw, 3.5rem); }
-            .label { font-size: 1rem; }
+        .mode-card .icon-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+            border: 2px solid #e6dcbe;
+        }
+        
+        .mode-card.hindi-card .icon-placeholder {
+            color: #2b8a3e;
+        }
+        .mode-card.hindi-card:hover {
+            border-color: #2b8a3e;
+            background-color: #f4fbf5;
+            box-shadow: 0 12px 25px rgba(43, 138, 62, 0.15);
+        }
+
+        .mode-card span {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        /* --- الهيكل الرئيسي المرن والمستجيب للمنصة --- */
+        .main-wrapper {
+            display: none; /* مخفي افتراضياً ويظهر عند اختيار الوضع */
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+            max-width: 1200px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(92, 77, 46, 0.15);
+            text-align: center;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .side-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(92, 77, 46, 0.1);
+            border: 2px solid #e6dcbe;
+            flex-shrink: 0;
+        }
+
+        .num-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #faf8f2;
+            border: 2px solid #dcd1b3;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .num-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .num-btn:active { transform: scale(0.92); }
+
+        .btn-clear-box {
+            background-color: #ffe3e3;
+            border-color: #ffa8a8;
+            color: #e03131;
+            font-size: 16px;
+        }
+        .btn-clear-box:hover { background-color: #e03131; color: white; border-color: #e03131; }
+
+        .header-title-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-title-area h2 { color: var(--primary-color); margin: 0; font-size: 26px; }
+        
+        .btn-back-home {
+            background-color: #f1f3f5;
+            color: #495057;
+            border: 2px solid #ced4da;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-back-home:hover { background-color: #e9ecef; color: #212529; }
+
+        .badge-info {
+            background-color: #e3fafc; color: #0b7285;
+            padding: 8px 20px; border-radius: 20px;
+            font-weight: bold; font-size: 18px; display: inline-block; margin-bottom: 25px;
+        }
+
+        .division-grid {
+            display: grid;
+            grid-gap: 14px 10px;
+            justify-content: center;
+            margin: 35px auto;
+            direction: ltr; 
+        }
+
+        .box {
+            width: var(--box-size); 
+            height: var(--box-size);
+            text-align: center; font-size: 26px; font-weight: bold;
+            border: 3.5px solid #bdcbd7; border-radius: 12px;
+            outline: none; box-sizing: border-box;
+            transition: all 0.25s ease;
+            -webkit-appearance: none; /* إلغاء المظهر الافتراضي الإجباري في الايفون */
+            box-shadow: none; /* إزالة أي ظلال داخلية يفرضها متصفح سفاري */
+        }
+        .box:focus { border-color: var(--primary-color); background-color: #f3f7ff; box-shadow: 0 0 8px rgba(0,51,170,0.2); }
+
+        .divisor-box { background-color: #ffe3e3; border-color: #ffa8a8; color: #e03131; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .dividend-box { background-color: #f3f0ff; border-color: #d0bfff; color: #6741d9; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: transform 0.3s ease; }
+        .bring-down-box { background-color: #e3fafc; border-color: #99e9f2; color: #0b7285; }
+        
+        .disabled-box { background-color: #e9ecef !important; border-color: #dee2e6 !important; color: #adb5bd !important; cursor: not-allowed; }
+        .box.correct { background-color: #d3f9d8 !important; border-color: #2b8a3e !important; color: #2b8a3e !important; }
+        .box.incorrect { background-color: #fff0f6 !important; border-color: #e03131 !important; color: #e03131 !important; }
+
+        .active-dividend-target {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 15px rgba(0, 51, 170, 0.4);
+            animation: tiltStep 0.8s ease-in-out infinite alternate;
+        }
+
+        .bring-down-box.bounce-trigger {
+            animation: bounceDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes tiltStep {
+            0% { transform: rotate(-10deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        @keyframes bounceDown {
+            0% { transform: translateY(-20px); opacity: 0; border-color: var(--primary-color); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .main-division-line { border-top: 5px solid #3b5bdb; margin-top: -6px; height: 0; }
+        
+        .sub-minus-line { 
+            border-top: 5px solid #c92a2a; 
+            margin-top: -6px; 
+            height: 0; 
+            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.15));
+        }
+        
+        .minus-sign { color: #e03131; font-size: 32px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+
+        .buttons-container { margin-top: 35px; display: flex; justify-content: center; gap: 15px; min-height: 60px; }
+        .btn { padding: 14px 40px; font-size: 20px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
+        .btn:active { transform: scale(0.96); }
+        .btn-check { background-color: #2b8a3e; color: white; }
+        .btn-check:hover { background-color: #237032; }
+        .btn-next { background-color: var(--primary-color); color: white; display: none; }
+        .btn-next:hover { background-color: #002680; }
+
+        .score-screen { display: none; }
+        .score-screen h3 { color: #2b8a3e; font-size: 32px; }
+        .score-screen p { font-size: 22px; color: #495057; }
+
+        /* ==========================================================================
+           قواعد الاستجابة المخصصة لشاشات الجوال والآيفون (Responsive Design)
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .cards-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .main-wrapper {
+                flex-direction: column; /* تحويل الترتيب إلى رأسي لتوفير مساحة أفقية كاملة للمسألة */
+                gap: 15px;
+            }
+            .side-bar {
+                flex-direction: row; /* تحويل شريط الأرقام الجانبي إلى صف أفقي */
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+                padding: 10px;
+                gap: 8px;
+            }
+            .num-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            .btn-clear-box {
+                font-size: 14px;
+            }
+            .container {
+                padding: 20px 15px;
+            }
+            :root {
+                --box-size: 42px; /* تصغير المربعات بشكل يتناسب مع شاشات الجوال */
+            }
+            .box {
+                font-size: 20px;
+                border-width: 2.5px;
+                border-radius: 8px;
+            }
+            .divisor-box, .dividend-box {
+                font-size: 20px;
+            }
+            .division-grid {
+                grid-gap: 10px 6px;
+                margin: 20px auto;
+            }
+            .selection-screen h1 { font-size: 26px; }
+            .header-title-area h2 { font-size: 22px; }
+            .minus-sign { font-size: 24px; }
+            .main-division-line, .sub-minus-line { border-top-width: 3.5px; }
+        }
+
+        @media (max-width: 390px) { /* متوافق خصيصاً مع موديلات آيفون برو والآيفون العادي */
+            :root {
+                --box-size: 36px; /* حجم مثالي جداً يمنع أي خروج للمسألة عن نطاق الشاشة الضيقة */
+            }
+            .box {
+                font-size: 16px;
+                border-width: 2px;
+                border-radius: 6px;
+            }
+            .divisor-box, .dividend-box {
+                font-size: 16px;
+            }
+            .division-grid {
+                grid-gap: 8px 4px;
+            }
+            .num-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
         }
     </style>
 </head>
-<body onclick="initAudioContext()">
+<body>
 
-    <div class="app-container" id="main-container">
-        <div class="side-watermark wm-left">
-            <div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div>
+<div class="watermark-container">
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+    <div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div><div class="watermark-item">أحمد فتحي أبوجبل</div>
+</div>
+
+<div id="selectionScreen" class="selection-screen">
+    <h1>المعلم أحمد فتحي أبوجبل</h1>
+    <h2>منصة التميز الذكية للقسمة المطولة</h2>
+    
+    <div class="cards-container">
+        <div class="mode-card" onclick="launchPlatform('en')">
+            <div class="icon-placeholder">123</div>
+            <span>الأرقام الإنجليزية</span>
         </div>
-        <div class="side-watermark wm-right">
-            <div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div><div class="wm-text">أحمد أبو جبل</div>
+        <div class="mode-card hindi-card" onclick="launchPlatform('hi')">
+            <div class="icon-placeholder">١٢٣</div>
+            <span>الأرقام العربية (الهندية)</span>
+        </div>
+    </div>
+</div>
+
+<div id="mainWrapper" class="main-wrapper">
+    <div class="side-bar" id="leftSidebar"></div>
+
+    <div class="container">
+        <div id="quizInterface">
+            <div class="header-title-area">
+                <h2>المعلم أحمد فتحي أبوجبل</h2>
+                <button class="btn-back-home" onclick="backToHome()">🏠 تغيير النظام</button>
+            </div>
+            <div id="questionBadge" class="badge-info">السؤال 1 من 10</div>
+            
+            <div id="divisionPlatform" class="division-grid"></div>
+
+            <div class="buttons-container">
+                <button id="btnCheck" onclick="checkAnswers()" class="btn btn-check">التحقق من الإجابة</button>
+                <button id="btnNext" onclick="nextQuestion()" class="btn btn-next">السؤال التالي ←</button>
+            </div>
         </div>
 
-        <div class="quiz-content">
-            <div id="quiz-part">
-                <div id="progress">السؤال ١ من ١٥</div>
-                <div id="note" class="instruction-note">💡 يا بطل، ابدأ بالحل في ورقتك أولاً، ثم اكتب الجواب النهائي هنا.</div>
-                
-                <div class="math-grid">
-                    <div class="label lbl-h">مئات</div><div class="label lbl-t">عشرات</div><div class="label lbl-o">آحاد</div><div></div>
-                    
-                    <!-- صف الحمل -->
-                    <div></div>
-                    <div class="carry-cell">
-                        <div id="carry-box" class="carry-box">١</div>
-                    </div>
-                    <div></div>
-                    <div></div>
-
-                    <!-- الصف العلوي -->
-                    <div class="digit h-digit" id="n1-h">٠</div>
-                    <div class="digit t-digit" id="n1-t">٠</div>
-                    <div class="digit o-digit" id="n1-o">٠</div>
-                    <div></div>
-                    
-                    <!-- الصف السفلي -->
-                    <div class="digit h-digit" id="n2-h">٠</div>
-                    <div class="digit t-digit" id="n2-t">٠</div>
-                    <div class="digit o-digit" id="n2-o">٠</div>
-                    <div class="sign">+</div>
-                    
-                    <!-- الخط الفاصل -->
-                    <div class="v-line"></div>
-                    
-                    <!-- صف المدخلات (الناتج) -->
-                    <div class="input-cell">
-                        <input type="text" id="input-hundreds" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
-                    </div>
-                    <div class="input-cell">
-                        <input type="text" id="input-tens" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
-                    </div>
-                    <div class="input-cell">
-                        <input type="text" id="input-ones" class="digit-input" inputmode="numeric" maxlength="1" autocomplete="off">
-                    </div>
-                    <div></div>
-                </div>
-
-                <div id="hint-area"></div>
-            </div>
-
-            <div id="report" style="display:none;">
-                <h2 style="color: var(--primary); font-size: 2.5rem;">النتيجة النهائية</h2>
-                <div id="final-score" class="final-score-val"></div>
-                <div id="feedback-msg" style="font-size: 1.8rem; margin-bottom: 35px; font-weight: bold;"></div>
-                <button class="restart-btn" onclick="location.reload()">إعادة الاختبار</button>
-            </div>
+        <div id="scoreScreen" class="score-screen">
+            <h3>🎉 رائع جداً، لقد انتهى الاختبار!</h3>
+            <p id="scoreText">لقد قمت بحل الـ 10 أسئلة كاملة بنجاح وتجاوزت تحديات القسمة المطولة بامتياز.</p>
+            <button onclick="startNewSession()" class="btn btn-next" style="display:inline-block;">بدء اختبار جديد</button>
         </div>
     </div>
 
-    <script>
-        let counter = 0, score = 0, isWaiting = false;
-        const totalQuestions = 15;
-        const hindiDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-        let audioCtx = null;
-        let currentQuestion = null;
+    <div class="side-bar" id="rightSidebar"></div>
+</div>
 
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const buffer = audioCtx.createBuffer(1, 1, 22050);
-                const source = audioCtx.createBufferSource();
-                source.buffer = buffer;
-                source.connect(audioCtx.destination);
-                source.start(0);
+<script>
+    const selectionScreen = document.getElementById('selectionScreen');
+    const mainWrapper = document.getElementById('mainWrapper');
+    const platform = document.getElementById('divisionPlatform');
+    const badge = document.getElementById('questionBadge');
+    const btnCheck = document.getElementById('btnCheck');
+    const btnNext = document.getElementById('btnNext');
+    const quizInterface = document.getElementById('quizInterface');
+    const scoreScreen = document.getElementById('scoreScreen');
+    const scoreText = document.getElementById('scoreText');
+
+    let currentMode = 'en'; // يحدد الوضع الحالي: 'en' للأرقام الإنجليزية، 'hi' للأرقام الهندية
+    let questionsPool = [];
+    let currentQuestionIndex = 0;
+    let lastFocusedInput = null;
+    let activeInputsSequence = []; 
+    let dividendLength = 0; 
+    let globalDivisor = 1; 
+    let globalDividendStr = ""; 
+    let zeroSkipTriggers = {}; 
+
+    // دالة مرنة لتحويل الأرقام البصرية بناءً على الوضع المختار
+    function formatDigit(num) {
+        if (num === null || num === undefined) return '';
+        if (currentMode === 'en') return num.toString();
+        
+        const hindiDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        return num.toString().replace(/[0-9]/g, w => hindiDigits[+w]);
+    }
+
+    // تشغيل المنصة بناء على اختيار الطالب لحزمة الأرقام
+    function launchPlatform(mode) {
+        currentMode = mode;
+        selectionScreen.style.display = 'none';
+        mainWrapper.style.display = 'flex';
+        
+        // بناء الكيبورد الجانبي ديناميكياً ليناسب الأرقام المختارة
+        buildSidebars();
+        startNewSession();
+    }
+
+    // العودة للواجهة الرئيسية وتصفير الذاكرة
+    function backToHome() {
+        mainWrapper.style.display = 'none';
+        selectionScreen.style.display = 'block';
+    }
+
+    // بناء الأشرطة الجانبية بناء على وضعية الأرقام
+    function buildSidebars() {
+        const leftSidebar = document.getElementById('leftSidebar');
+        const rightSidebar = document.getElementById('rightSidebar');
+        
+        const leftNums = [1, 3, 5, 7, 9];
+        const rightNums = [0, 2, 4, 6, 8];
+
+        let leftHTML = leftNums.map(n => `<button class="num-btn" onclick="pressNumber('${formatDigit(n)}')">${formatDigit(n)}</button>`).join('');
+        leftHTML += `<button class="num-btn btn-clear-box" onclick="pressClear()">مسح</button>`;
+        leftSidebar.innerHTML = leftHTML;
+
+        let rightHTML = rightNums.map(n => `<button class="num-btn" onclick="pressNumber('${formatDigit(n)}')">${formatDigit(n)}</button>`).join('');
+        rightHTML += `<button class="num-btn btn-clear-box" onclick="pressClear()">مسح</button>`;
+        rightSidebar.innerHTML = rightHTML;
+    }
+
+    function startNewSession() {
+        questionsPool = [];
+        currentQuestionIndex = 0;
+        quizInterface.style.display = 'block';
+        scoreScreen.style.display = 'none';
+        lastFocusedInput = null;
+
+        let c1 = 0;
+        while(c1 < 7) {
+            let divisor = Math.floor(Math.random() * 8) + 2; 
+            let dividend = Math.floor(Math.random() * 8999) + 1000; 
+            let shouldBeExact = (c1 < 4);
+            if (shouldBeExact) dividend = dividend - (dividend % divisor);
+            else if (dividend % divisor === 0) dividend += Math.floor(Math.random() * (divisor - 1)) + 1;
+
+            if (dividend >= 1000 && dividend <= 9999) {
+                if(!questionsPool.some(q => q.dividend === dividend && q.divisor === divisor)) {
+                    questionsPool.push({ divisor, dividend });
+                    c1++;
+                }
             }
-            if (isWaiting) { isWaiting = false; nextQuest(); }
         }
 
-        function playSound(type) {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            if (type === 'success') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
+        let c2 = 0;
+        while(c2 < 3) {
+            let divisor = Math.floor(Math.random() * 85) + 11; 
+            if (divisor % 10 === 0) continue;
+            let dividend = Math.floor(Math.random() * 8999) + 1000;
+            let shouldBeExact = (c2 < 1);
+            if (shouldBeExact) dividend = dividend - (dividend % divisor);
+            else if (dividend % divisor === 0) dividend += Math.floor(Math.random() * (divisor - 1)) + 1;
+
+            if (dividend >= 1000 && dividend <= 9999) {
+                if(!questionsPool.some(q => q.dividend === dividend && q.divisor === divisor)) {
+                    questionsPool.push({ divisor, dividend });
+                    c2++;
+                }
+            }
+        }
+
+        questionsPool.sort(() => Math.random() - 0.5);
+        loadCurrentQuestion();
+    }
+
+    function loadCurrentQuestion() {
+        btnNext.style.display = 'none';
+        btnCheck.style.display = 'inline-block';
+        badge.innerText = `السؤال ${formatDigit(currentQuestionIndex + 1)} من ${formatDigit(10)}`;
+        zeroSkipTriggers = {};
+
+        const currentQuestion = questionsPool[currentQuestionIndex];
+        const divisor = currentQuestion.divisor;
+        const dividendStr = currentQuestion.dividend.toString();
+        dividendLength = dividendStr.length;
+        globalDivisor = divisor;
+        globalDividendStr = dividendStr;
+
+        const totalColumns = dividendStr.length + 3; 
+        platform.style.gridTemplateColumns = `repeat(${totalColumns}, var(--box-size))`; 
+
+        let quotientRowHTML = '';
+        let stepBlocks = []; 
+
+        let quotientData = [];
+        let tempRem = 0;
+        let nonZeroFound = false;
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let val = tempRem * 10 + parseInt(dividendStr[i]);
+            let q = Math.floor(val / divisor);
+            if (q > 0) nonZeroFound = true;
+            quotientData.push({ value: q, isLeadingZero: !nonZeroFound && q === 0 });
+            tempRem = val % divisor;
+        }
+
+        let zeroChar = formatDigit(0);
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let qInfo = quotientData[i];
+            let col = 4 + i;
+            let id = `q-${i}`;
+            if (qInfo.isLeadingZero) {
+                quotientRowHTML += `<input type="text" id="${id}" class="box disabled-box" data-ans="${zeroChar}" value="-" disabled style="grid-column: ${col}; grid-row: 1;">`;
             } else {
-                [0, 0.1, 0.2].forEach(delay => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.type = 'square'; osc.frequency.setValueAtTime(150, now + delay);
-                    gain.gain.setValueAtTime(0.1, now + delay); gain.gain.linearRampToValueAtTime(0.01, now + delay + 0.1);
-                    osc.start(now + delay); osc.stop(now + delay + 0.1);
-                });
+                quotientRowHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(qInfo.value)}" style="grid-column: ${col}; grid-row: 1;" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
             }
         }
 
-        function speak(txt) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const m = new SpeechSynthesisUtterance(txt);
-                m.lang = 'ar-SA';
-                window.speechSynthesis.speak(m);
-            }
+        let staticRowHTML = '';
+        if (divisor < 10) {
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 2; grid-row: 2;">${formatDigit(divisor)}</div>`;
+        } else {
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 1; grid-row: 2;">${formatDigit(Math.floor(divisor/10))}</div>`;
+            staticRowHTML += `<div class="box divisor-box" style="grid-column: 2; grid-row: 2;">${formatDigit(divisor%10)}</div>`;
         }
 
-        function setupInputs() {
-            const h = document.getElementById('input-hundreds'), 
-                  t = document.getElementById('input-tens'), 
-                  o = document.getElementById('input-ones');
-            
-            const inputs = [o, t, h];
-            
-            // معالج الآحاد
-            o.addEventListener('input', () => {
-                let normalized = o.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
-                if (normalized.length > 0) {
-                    o.value = hindiDigits[normalized.slice(-1)];
-                    const userOnes = parseInt(normalized.slice(-1));
-                    const correctOnes = currentQuestion.ans % 10;
+        for (let i = 0; i < dividendStr.length; i++) {
+            staticRowHTML += `<div id="dividend-digit-${i}" class="box dividend-box" style="grid-column: ${4 + i}; grid-row: 2;">${formatDigit(dividendStr[i])}</div>`;
+        }
+        staticRowHTML += `<div class="main-division-line" style="grid-column: 3 / span ${dividendStr.length + 1}; grid-row: 2; align-self: end;"></div>`;
+
+        let currentRow = 3;
+        let runningVal = 0;
+        let hasSubtractedYet = false;
+        let accumulatedCarryRowOffset = 0;
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            let col = 4 + i;
+            let digit = parseInt(dividendStr[i]);
+            runningVal = runningVal * 10 + digit;
+            let q = quotientData[i].value;
+
+            if (quotientData[i].isLeadingZero) {
+                continue; 
+            }
+
+            let blockHTML = '';
+            let blockInputs = [];
+            let isZeroStep = (q === 0);
+
+            if (hasSubtractedYet) {
+                let id = `down-${i}`;
+                let rowTarget = currentRow - 1 - accumulatedCarryRowOffset;
+                blockHTML += `<input type="text" id="${id}" class="box bring-down-box" data-ans="${formatDigit(digit)}" style="grid-column: ${col}; grid-row: ${rowTarget};" maxlength="1" placeholder="↓" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                blockInputs.push(id);
+            }
+
+            let prod = q * divisor;
+            let nextRem = runningVal - prod;
+            let prodStr = prod.toString();
+            let localProdIds = [];
+            let localRemIds = [];
+            let maxLen = Math.max(runningVal.toString().length, prodStr.length);
+
+            if (isZeroStep && i < dividendStr.length - 1) {
+                zeroSkipTriggers[`q-${i}`] = {
+                    nextTargetId: `down-${i+1}`,
+                    clearIds: []
+                };
+                accumulatedCarryRowOffset += 2; 
+            } else {
+                blockHTML += `<div class="minus-sign" style="grid-column: 3; grid-row: ${currentRow - accumulatedCarryRowOffset};">-</div>`;
+
+                for (let p = 0; p < maxLen; p++) {
+                    let pDigit = (p < prodStr.length) ? prodStr[prodStr.length - 1 - p] : '0';
+                    let id = `prod-${i}-${p}`;
+                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(pDigit)}" style="grid-column: ${col - p}; grid-row: ${currentRow - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                    localProdIds.push(id); 
+                }
+                blockInputs.push(...localProdIds);
+                
+                let startCol = col - maxLen + 1;
+                blockHTML += `<div class="sub-minus-line" style="grid-column: ${startCol} / span ${maxLen}; grid-row: ${currentRow - accumulatedCarryRowOffset}; align-self: end;"></div>`;
+
+                let remStr = nextRem.toString().padStart(maxLen, '0');
+                
+                for (let r = maxLen - 1; r >= 0; r--) {
+                    let rDigit = remStr[r];
+                    let rCol = col - maxLen + 1 + r;
+                    let id = `rem-${i}-${r}`;
                     
-                    if (userOnes === correctOnes) {
-                        // حساب الحمل من الآحاد
-                        const n1Ones = currentQuestion.n1 % 10;
-                        const n2Ones = currentQuestion.n2 % 10;
-                        const carry = Math.floor((n1Ones + n2Ones) / 10);
-                        
-                        if (carry > 0) {
-                            document.getElementById('carry-box').innerText = toH(carry);
-                            document.getElementById('carry-box').classList.add('show');
-                        } else {
-                            document.getElementById('carry-box').classList.remove('show');
+                    if (rDigit === '0') {
+                        let isLeftZero = true;
+                        for (let k = 0; k < r; k++) {
+                            if (remStr[k] !== '0') { isLeftZero = false; break; }
                         }
-                        
-                        // الانتقال مباشرة للعشرات مع تأخير بسيط لضمان ظهور الرقم
-                        setTimeout(() => {
-                            t.focus();
-                            t.value = '';
-                        }, 350);
+                        if (isLeftZero) {
+                            if (r === remStr.length - 1) {
+                                blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                localRemIds.push(id);
+                            } else {
+                                if (remStr[r+1] === '0') {
+                                    blockHTML += `<div style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};"></div>`;
+                                } else {
+                                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                    localRemIds.push(id);
+                                }
+                            }
+                        } else {
+                            blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                            localRemIds.push(id);
+                        }
                     } else {
-                        document.getElementById('carry-box').classList.remove('show');
-                        setTimeout(() => o.focus(), 100);
+                        blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                        localRemIds.push(id);
                     }
                 }
-            });
-            
-            // معالج العشرات
-            t.addEventListener('input', () => {
-                let normalized = t.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
-                if (normalized.length > 0) {
-                    t.value = hindiDigits[normalized.slice(-1)];
-                    const userTens = parseInt(normalized.slice(-1));
-                    const correctTens = Math.floor((currentQuestion.ans % 100) / 10);
-                    
-                    if (userTens === correctTens) {
-                        setTimeout(() => {
-                            h.focus();
-                            h.value = '';
-                        }, 350);
-                    } else {
-                        setTimeout(() => t.focus(), 150);
-                    }
+                blockInputs.push(...localRemIds);
+                
+                if (isZeroStep) {
+                    zeroSkipTriggers[`q-${i}`] = { nextTargetId: null, clearIds: [...localProdIds, ...localRemIds] };
                 }
+            }
+
+            runningVal = nextRem;
+            hasSubtractedYet = true;
+            currentRow += 2; 
+
+            stepBlocks.push({
+                index: i,
+                html: blockHTML,
+                inputs: blockInputs,
+                hasQuotient: !quotientData[i].isLeadingZero,
+                localProdCount: localProdIds.length,
+                localRemCount: localRemIds.length,
+                isZeroStep: isZeroStep
             });
-            
-            // معالج المئات
-            h.addEventListener('input', () => {
-                let normalized = h.value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d)).replace(/[^0-9]/g, '');
-                if (normalized.length > 0) {
-                    h.value = hindiDigits[normalized.slice(-1)];
-                    h.blur();
-                    setTimeout(check, 400);
+        }
+
+        activeInputsSequence = [];
+        let finalGridHTML = quotientRowHTML + staticRowHTML;
+
+        stepBlocks.forEach(block => {
+            finalGridHTML += block.html;
+            let idx = 0;
+
+            if (block.inputs.length > 0 && block.inputs[0].startsWith('down-')) {
+                activeInputsSequence.push(block.inputs[idx++]);
+            }
+
+            if (block.hasQuotient) {
+                activeInputsSequence.push(`q-${block.index}`);
+            }
+
+            if (!block.isZeroStep || block.index === dividendStr.length - 1) {
+                for (let p = 0; p < block.localProdCount; p++) {
+                    activeInputsSequence.push(block.inputs[idx++]);
                 }
-            });
-            
-            inputs.forEach(input => {
-                input.addEventListener('focus', () => { 
-                    if (!isWaiting) input.value = ""; 
-                });
-            });
+                for (let r = 0; r < block.localRemCount; r++) {
+                    activeInputsSequence.push(block.inputs[idx++]);
+                }
+            }
+        });
+
+        platform.innerHTML = finalGridHTML;
+        
+        activeInputsSequence = activeInputsSequence.filter(id => {
+            let el = document.getElementById(id);
+            return el && !el.disabled;
+        });
+
+        setTimeout(() => {
+            if(activeInputsSequence.length > 0) {
+                let firstInput = document.getElementById(activeInputsSequence[0]);
+                if(firstInput) firstInput.focus();
+            }
+            updateVisualWobble(); 
+        }, 50);
+    }
+
+    function trackFocus(inputElement) {
+        lastFocusedInput = inputElement;
+        updateVisualWobble(); 
+    }
+
+    function updateVisualWobble() {
+        for (let i = 0; i < dividendLength; i++) {
+            let digitBox = document.getElementById(`dividend-digit-${i}`);
+            if (digitBox) digitBox.classList.remove('active-dividend-target');
         }
 
-        function generate() {
-            let n1_o = Math.floor(Math.random() * 6) + 4; 
-            let n2_o = Math.floor(Math.random() * 6) + 4; 
-            let n1_t = Math.floor(Math.random() * 7) + 1;
-            let n2_t = Math.floor(Math.random() * (8 - n1_t));
-            let n1_h = Math.floor(Math.random() * 4) + 1;
-            let n2_h = Math.floor(Math.random() * 4) + 1;
-            let n1 = n1_h * 100 + n1_t * 10 + n1_o;
-            let n2 = n2_h * 100 + n2_t * 10 + n2_o;
-            return { n1, n2, ans: n1 + n2 };
+        if (!lastFocusedInput) return;
+
+        let idParts = lastFocusedInput.id.split('-');
+        let stepIndex = parseInt(idParts[1]);
+
+        if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < dividendLength) {
+            let firstDigitVal = parseInt(globalDividendStr[0]);
+            
+            if (firstDigitVal < globalDivisor) {
+                if (stepIndex === 0 || stepIndex === 1) {
+                    let digit0 = document.getElementById(`dividend-digit-0`);
+                    let digit1 = document.getElementById(`dividend-digit-1`);
+                    if (digit0) digit0.classList.add('active-dividend-target');
+                    if (digit1) digit1.classList.add('active-dividend-target');
+                    return;
+                }
+            }
+
+            let activeDigit = document.getElementById(`dividend-digit-${stepIndex}`);
+            if (activeDigit) {
+                activeDigit.classList.add('active-dividend-target');
+            }
         }
+    }
 
-        const questions = Array.from({length: totalQuestions}, generate);
-
-        function load() {
-            if (counter >= totalQuestions) { finish(); return; }
-            currentQuestion = questions[counter];
-            const q = currentQuestion;
-            const d1 = q.n1.toString().padStart(3,'0').split(''), d2 = q.n2.toString().padStart(3,'0').split('');
-            
-            document.getElementById('n1-h').innerText = toH(d1[0]); 
-            document.getElementById('n1-t').innerText = toH(d1[1]); 
-            document.getElementById('n1-o').innerText = toH(d1[2]);
-            document.getElementById('n2-h').innerText = toH(d2[0]); 
-            document.getElementById('n2-t').innerText = toH(d2[1]); 
-            document.getElementById('n2-o').innerText = toH(d2[2]);
-            document.getElementById('progress').innerText = `السؤال ${toH(counter+1)} من ${toH(totalQuestions)}`;
-            document.getElementById('note').style.display = counter === 0 ? "block" : "none";
-            
-            document.querySelectorAll('.digit-input').forEach(i => { 
-                i.value = ""; 
-                i.classList.remove('correct-box', 'wrong-box'); 
-                i.disabled = false; 
-            });
-            
-            document.getElementById('carry-box').classList.remove('show');
-            document.getElementById('hint-area').innerHTML = "";
-            
-            setTimeout(() => document.getElementById('input-ones').focus(), 500);
-        }
-
-        function check() {
-            const hVal = document.getElementById('input-hundreds').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
-            const tVal = document.getElementById('input-tens').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
-            const oVal = document.getElementById('input-ones').value.replace(/[٠-٩]/g, d => hindiDigits.indexOf(d));
-            
-            if (hVal === "" || tVal === "" || oVal === "") return;
-            
-            const userAns = parseInt(hVal + tVal + oVal), q = currentQuestion;
-            if (userAns === q.ans) {
-                score++; 
-                playSound('success');
-                document.querySelectorAll('.digit-input').forEach(i => i.classList.add('correct-box'));
-                speak("بطل! إجابة صحيحة");
-                setTimeout(nextQuest, 1200);
-            } else {
-                playSound('error');
-                showCorrect(q);
+    function handleAutoAdvance() {
+        if (!lastFocusedInput) return;
+        
+        let zeroChar = formatDigit(0);
+        if (lastFocusedInput.id.startsWith('q-') && lastFocusedInput.value === zeroChar) {
+            let trigger = zeroSkipTriggers[lastFocusedInput.id];
+            if (trigger && trigger.nextTargetId) {
+                let nextTargetBox = document.getElementById(trigger.nextTargetId);
+                if (nextTargetBox) {
+                    nextTargetBox.classList.add('bounce-trigger');
+                    setTimeout(() => { nextTargetBox.focus(); }, 150);
+                    updateVisualWobble();
+                    return;
+                }
             }
         }
 
-        function showCorrect(q) {
-            const res = q.ans.toString().padStart(3,'0').split('');
-            document.getElementById('input-hundreds').value = toH(res[res.length-3] || 0);
-            document.getElementById('input-tens').value = toH(res[res.length-2]);
-            document.getElementById('input-ones').value = toH(res[res.length-1]);
-            document.querySelectorAll('.digit-input').forEach(i => { 
-                i.classList.add('wrong-box'); 
-                i.disabled = true; 
-            });
-            document.getElementById('hint-area').innerHTML = `<span class='error-hint'>انتبه لإعادة التجميع!</span><div class='click-prompt' onclick='initAudioContext()'>المس هنا للاستمرار</div>`;
-            isWaiting = true;
+        if (lastFocusedInput.value.length >= 1) {
+            let currentIndex = activeInputsSequence.indexOf(lastFocusedInput.id);
+            if (currentIndex !== -1 && currentIndex < activeInputsSequence.length - 1) {
+                let nextInput = document.getElementById(activeInputsSequence[currentIndex + 1]);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        }
+        updateVisualWobble(); 
+    }
+
+    function pressNumber(num) {
+        if (lastFocusedInput && !lastFocusedInput.disabled) {
+            lastFocusedInput.value = num;
+            handleAutoAdvance();
+        }
+    }
+
+    function pressClear() {
+        if (lastFocusedInput && !lastFocusedInput.disabled) {
+            lastFocusedInput.value = '';
+        }
+    }
+
+    function checkAnswers() {
+        for (let i = 0; i < dividendLength; i++) {
+            let digitBox = document.getElementById(`dividend-digit-${i}`);
+            if (digitBox) digitBox.classList.remove('active-dividend-target');
         }
 
-        function nextQuest() { 
-            counter++; 
-            load(); 
-        }
+        let zeroChar = formatDigit(0);
 
-        function finish() {
-            document.getElementById('quiz-part').style.display = 'none';
-            document.getElementById('report').style.display = 'block';
-            const p = Math.round((score / totalQuestions) * 100);
-            document.getElementById('final-score').innerText = `%${toH(p)}`;
-            document.getElementById('final-score').style.color = p >= 90 ? "var(--success)" : "var(--error)";
-            document.getElementById('feedback-msg').innerText = p >= 95 ? "ممتاز يا بطل! أتقنت مهارة إعادة التجميع" : "راجع مهارة إعادة التجميع وحاول مرة أخرى";
-            speak(document.getElementById('feedback-msg').innerText);
-        }
+        const inputs = platform.querySelectorAll('input:not([disabled])');
+        inputs.forEach(input => {
+            const userAnswer = input.value.trim();
+            const correctAnswer = input.getAttribute('data-ans');
+            const isLeftZero = input.getAttribute('data-is-left-zero') === 'true';
 
-        function toH(n) { 
-            return n.toString().replace(/\d/g, d => hindiDigits[d]); 
-        }
+            if (isLeftZero && correctAnswer === zeroChar && (userAnswer === zeroChar || userAnswer === '')) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                if (userAnswer === '') input.value = zeroChar; 
+            } 
+            else if (userAnswer === correctAnswer || (correctAnswer === zeroChar && userAnswer === '')) {
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                if (userAnswer === '') input.value = zeroChar;
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                input.value = correctAnswer; 
+            }
+        });
 
-        window.onload = () => { 
-            setupInputs(); 
-            load(); 
-        };
-    </script>
+        btnCheck.style.display = 'none';
+        btnNext.style.display = 'inline-block';
+        if (currentQuestionIndex === 9) btnNext.innerText = "عرض النتيجة النهائية 📊";
+        else btnNext.innerText = "السؤال التالي ←";
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < 9) {
+            currentQuestionIndex++;
+            loadCurrentQuestion();
+        } else {
+            quizInterface.style.display = 'none';
+            scoreScreen.style.display = 'block';
+            scoreText.innerText = `لقد قمت بحل الـ ${formatDigit(10)} أسئلة كاملة بنجاح وتجاوزت تحديات القسمة المطولة بامتياز.`;
+        }
+    }
+</script>
+
 </body>
 </html>
