@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>المعلم أحمد فتحي أبوجبل</title>
     <style>
+        /* إعادة تعيين لمنع أي تمرير أو ظهور عناصر إضافية في الآيفون */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* منع التحديد الأزرق عند اللمس المستمر */
         }
 
         :root {
-            --box-size: 70px; /* تكبير المربعات بشكل ملحوظ */
+            --box-size: 75px; /* مربعات ضخمة جداً لرؤية ولمس مريحين */
             --primary-color: #0033aa;
         }
 
@@ -23,12 +25,12 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
+            overflow: hidden; /* حظر التمرير تماماً لتبقى المسألة ثابتة في الشاشة */
             position: relative;
             padding: 10px;
         }
 
-        /* --- تأثير العلامة المائية --- */
+        /* --- تأثير العلامة المائية باسم أحمد فتحي أبوجبل --- */
         .watermark-container {
             position: fixed;
             top: 0;
@@ -50,7 +52,6 @@
             font-weight: bold;
             white-space: nowrap;
             transform: rotate(-25deg);
-            user-select: none;
             animation: glowFade 5s ease-in-out infinite alternate;
         }
 
@@ -112,11 +113,11 @@
         /* --- الهيكل الرئيسي المرن --- */
         .main-wrapper {
             display: none;
-            align-items: stretch;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 12px; /* مسافة قريبة ومثالية جداً لمنع تشتت الطالب */
             z-index: 10;
-            max-width: 1300px; 
+            max-width: 1400px; 
             width: 100%;
         }
 
@@ -127,24 +128,20 @@
             box-shadow: 0 15px 40px rgba(92, 77, 46, 0.15);
             text-align: center;
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
-        /* شريط الأرقام المدمج والمقرب جهة اليسار */
+        /* لوحة أرقام موحدة يسار المسألة مباشرة ملتصقة ومحفوظة من التشتت والظهور المشتت */
         .side-bar {
             display: flex;
             flex-direction: column;
             gap: 8px;
             background: #ffffff;
             padding: 12px;
-            border-radius: 20px;
+            border-radius: 18px;
             box-shadow: 0 10px 30px rgba(92, 77, 46, 0.1);
             border: 2px solid #e6dcbe;
-            width: 140px; /* عرض مدمج ومناسب للوضع اليساري */
+            width: 140px; 
             flex-shrink: 0;
-            justify-content: center;
         }
 
         .keyboard-grid {
@@ -155,19 +152,19 @@
 
         .num-btn {
             height: 55px;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             background-color: #faf8f2;
             border: 2px solid #dcd1b3;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .num-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-        .num-btn:active { transform: scale(0.92); }
+        .num-btn:active { transform: scale(0.9); }
 
         .btn-clear-box {
             grid-column: span 2;
@@ -190,38 +187,44 @@
         
         .btn-back-home {
             background-color: #f1f3f5; color: #495057; border: 2px solid #ced4da;
-            padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: bold;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold;
         }
 
         .badge-info {
             background-color: #e3fafc; color: #0b7285;
             padding: 6px 20px; border-radius: 20px;
-            font-weight: bold; font-size: 20px; display: inline-block; margin-bottom: 15px;
+            font-weight: bold; font-size: 20px; display: inline-block; margin-bottom: 10px;
         }
 
         .division-grid {
             display: grid;
             grid-gap: 12px 8px;
             justify-content: center;
-            margin: 20px auto;
+            margin: 15px auto;
             direction: ltr; 
         }
 
-        /* تكبير حجم الخط داخل المربعات */
+        /* تم تحويل المربعات إلى divs تفاعلية لحظر كيبورد النظام نهائياً وبشكل قطعي */
         .box {
             width: var(--box-size); 
             height: var(--box-size);
-            text-align: center; font-size: 32px; font-weight: bold;
+            text-align: center; font-size: 34px; font-weight: bold;
             border: 3.5px solid #bdcbd7; border-radius: 14px;
-            outline: none; box-sizing: border-box;
-            transition: all 0.2s ease;
-            -webkit-appearance: none;
-            box-shadow: none;
+            display: flex; align-items: center; justify-content: center;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
-        .box:focus { border-color: var(--primary-color); background-color: #f3f7ff; box-shadow: 0 0 10px rgba(0,51,170,0.3); }
+        
+        /* تأثير التحديد عند اختيار المربع والتركيز عليه */
+        .box.selected-target {
+            border-color: var(--primary-color) !important;
+            background-color: #f3f7ff !important;
+            box-shadow: 0 0 12px rgba(0,51,170,0.4) !important;
+        }
 
-        .divisor-box { background-color: #ffe3e3; border-color: #ffa8a8; color: #e03131; display: flex; align-items: center; justify-content: center; font-size: 32px; }
-        .dividend-box { background-color: #f3f0ff; border-color: #d0bfff; color: #6741d9; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .divisor-box { background-color: #ffe3e3; border-color: #ffa8a8; color: #e03131; cursor: default; }
+        .dividend-box { background-color: #f3f0ff; border-color: #d0bfff; color: #6741d9; cursor: default; }
         .bring-down-box { background-color: #e3fafc; border-color: #99e9f2; color: #0b7285; }
         
         .disabled-box { background-color: #e9ecef !important; border-color: #dee2e6 !important; color: #adb5bd !important; cursor: not-allowed; }
@@ -240,8 +243,8 @@
         .sub-minus-line { border-top: 5px solid #c92a2a; margin-top: -6px; height: 0; }
         .minus-sign { color: #e03131; font-size: 36px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
-        .buttons-container { margin-top: 20px; display: flex; justify-content: center; gap: 15px; min-height: 55px; }
-        .btn { padding: 12px 40px; font-size: 22px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+        .buttons-container { margin-top: 15px; display: flex; justify-content: center; gap: 15px; min-height: 55px; }
+        .btn { padding: 10px 35px; font-size: 22px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
         .btn-check { background-color: #2b8a3e; color: white; }
         .btn-next { background-color: var(--primary-color); color: white; display: none; }
 
@@ -249,18 +252,18 @@
         .score-screen h3 { color: #2b8a3e; font-size: 36px; }
         .score-screen p { font-size: 24px; color: #495057; }
 
-        /* مواءمة الشاشات المتجاوبة لجعل الكيبورد دائماً في مكان مثالي */
-        @media (max-width: 900px) {
-            :root { --box-size: 55px; }
-            .box, .divisor-box, .dividend-box { font-size: 26px; border-radius: 10px; }
-            .side-bar { width: 110px; padding: 8px; }
-            .num-btn { height: 45px; font-size: 20px; }
-            .btn-clear-box { font-size: 15px; height: 40px; }
+        /* توافق الشاشات لضمان التماسك الكامل وعدم خروج أي جزء */
+        @media (max-width: 950px) {
+            :root { --box-size: 58px; }
+            .box, .divisor-box, .dividend-box { font-size: 28px; border-radius: 10px; }
+            .side-bar { width: 110px; padding: 6px; }
+            .num-btn { height: 48px; font-size: 22px; }
+            .btn-clear-box { font-size: 16px; height: 42px; }
         }
 
-        @media (max-width: 600px) {
-            .main-wrapper { flex-direction: column-reverse; align-items: center; }
-            .side-bar { width: 100%; max-width: 340px; }
+        @media (max-width: 650px) {
+            .main-wrapper { flex-direction: column-reverse; align-items: center; gap: 10px; }
+            .side-bar { width: 100%; max-width: 360px; }
             .keyboard-grid { grid-template-columns: repeat(5, 1fr); }
             .btn-clear-box { grid-column: span 5; }
             :root { --box-size: 46px; }
@@ -335,7 +338,7 @@
     let currentMode = 'en'; 
     let questionsPool = [];
     let currentQuestionIndex = 0;
-    let lastFocusedInput = null;
+    let selectedBoxElement = null; 
     let activeInputsSequence = []; 
     let dividendLength = 0; 
     let globalDivisor = 1; 
@@ -362,7 +365,6 @@
         selectionScreen.style.display = 'block';
     }
 
-    // بناء كيبورد موحد يحتوي على كافة الأرقام مرتبة تصاعدياً لسهولة الاستخدام
     function buildSidebarHTML() {
         const grid = document.getElementById('keyboardGrid');
         const digitsOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -371,7 +373,7 @@
             `<button class="num-btn" onclick="pressNumber('${formatDigit(n)}')">${formatDigit(n)}</button>`
         ).join('');
         
-        html += `<button class="num-btn btn-clear-box" onclick="pressClear()">مسح الكل</button>`;
+        html += `<button class="num-btn btn-clear-box" onclick="pressClear()">مسح</button>`;
         grid.innerHTML = html;
     }
 
@@ -380,7 +382,7 @@
         currentQuestionIndex = 0;
         quizInterface.style.display = 'block';
         scoreScreen.style.display = 'none';
-        lastFocusedInput = null;
+        selectedBoxElement = null;
 
         let c1 = 0;
         while(c1 < 7) {
@@ -456,9 +458,9 @@
             let col = 4 + i;
             let id = `q-${i}`;
             if (qInfo.isLeadingZero) {
-                quotientRowHTML += `<input type="text" id="${id}" class="box disabled-box" data-ans="${zeroChar}" value="-" disabled style="grid-column: ${col}; grid-row: 1;">`;
+                quotientRowHTML += `<div id="${id}" class="box disabled-box" data-ans="${zeroChar}" data-val="-" style="grid-column: ${col}; grid-row: 1;">-</div>`;
             } else {
-                quotientRowHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(qInfo.value)}" style="grid-column: ${col}; grid-row: 1;" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                quotientRowHTML += `<div id="${id}" class="box" data-ans="${formatDigit(qInfo.value)}" data-val="" style="grid-column: ${col}; grid-row: 1;" onclick="selectBox(this)"></div>`;
             }
         }
 
@@ -495,7 +497,7 @@
             if (hasSubtractedYet) {
                 let id = `down-${i}`;
                 let rowTarget = currentRow - 1 - accumulatedCarryRowOffset;
-                blockHTML += `<input type="text" id="${id}" class="box bring-down-box" data-ans="${formatDigit(digit)}" style="grid-column: ${col}; grid-row: ${rowTarget};" maxlength="1" placeholder="↓" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                blockHTML += `<div id="${id}" class="box bring-down-box" data-ans="${formatDigit(digit)}" data-val="" style="grid-column: ${col}; grid-row: ${rowTarget};" onclick="selectBox(this)">↓</div>`;
                 blockInputs.push(id);
             }
 
@@ -515,7 +517,7 @@
                 for (let p = 0; p < maxLen; p++) {
                     let pDigit = (p < prodStr.length) ? prodStr[prodStr.length - 1 - p] : '0';
                     let id = `prod-${i}-${p}`;
-                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(pDigit)}" style="grid-column: ${col - p}; grid-row: ${currentRow - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                    blockHTML += `<div id="${id}" class="box" data-ans="${formatDigit(pDigit)}" data-val="" style="grid-column: ${col - p}; grid-row: ${currentRow - accumulatedCarryRowOffset};" onclick="selectBox(this)"></div>`;
                     localProdIds.push(id); 
                 }
                 blockInputs.push(...localProdIds);
@@ -537,22 +539,22 @@
                         }
                         if (isLeftZero) {
                             if (r === remStr.length - 1) {
-                                blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                blockHTML += `<div id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" data-val="" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" onclick="selectBox(this)"></div>`;
                                 localRemIds.push(id);
                             } else {
                                 if (remStr[r+1] === '0') {
                                     blockHTML += `<div style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};"></div>`;
                                 } else {
-                                    blockHTML += `<input type="text" id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                                    blockHTML += `<div id="${id}" class="box" data-ans="${zeroChar}" data-is-left-zero="true" data-val="" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" onclick="selectBox(this)"></div>`;
                                     localRemIds.push(id);
                                 }
                             }
                         } else {
-                            blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                            blockHTML += `<div id="${id}" class="box" data-ans="${formatDigit(rDigit)}" data-val="" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" onclick="selectBox(this)"></div>`;
                             localRemIds.push(id);
                         }
                     } else {
-                        blockHTML += `<input type="text" id="${id}" class="box" data-ans="${formatDigit(rDigit)}" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" maxlength="1" onfocus="trackFocus(this)" oninput="handleAutoAdvance()">`;
+                        blockHTML += `<div id="${id}" class="box" data-ans="${formatDigit(rDigit)}" data-val="" style="grid-column: ${rCol}; grid-row: ${currentRow + 1 - accumulatedCarryRowOffset};" onclick="selectBox(this)"></div>`;
                         localRemIds.push(id);
                     }
                 }
@@ -592,26 +594,32 @@
         
         activeInputsSequence = activeInputsSequence.filter(id => {
             let el = document.getElementById(id);
-            return el && !el.disabled;
-        });
-
-        // تفعيل خاصية إلغاء كيبورد الجوال لجميع المربعات المضافة حديثاً
-        platform.querySelectorAll('input').forEach(input => {
-            input.setAttribute('inputmode', 'none');
+            return el && !el.classList.contains('disabled-box');
         });
 
         setTimeout(() => {
             if(activeInputsSequence.length > 0) {
-                let firstInput = document.getElementById(activeInputsSequence[0]);
-                if(firstInput) firstInput.focus();
+                let firstBox = document.getElementById(activeInputsSequence[0]);
+                if(firstBox) selectBox(firstBox);
             }
-            updateVisualWobble(); 
         }, 50);
     }
 
-    function trackFocus(inputElement) {
-        lastFocusedInput = inputElement;
-        updateVisualWobble(); 
+    function selectBox(element) {
+        if (element.classList.contains('disabled-box') || element.classList.contains('correct') || element.classList.contains('incorrect')) return;
+        
+        if (selectedBoxElement) {
+            selectedBoxElement.classList.remove('selected-target');
+        }
+        
+        selectedBoxElement = element;
+        selectedBoxElement.classList.add('selected-target');
+        
+        if (selectedBoxElement.id.startsWith('down-') && selectedBoxElement.getAttribute('data-val') === "") {
+            selectedBoxElement.innerText = "";
+        }
+
+        updateVisualWobble();
     }
 
     function updateVisualWobble() {
@@ -620,9 +628,9 @@
             if (digitBox) digitBox.classList.remove('active-dividend-target');
         }
 
-        if (!lastFocusedInput) return;
+        if (!selectedBoxElement) return;
 
-        let idParts = lastFocusedInput.id.split('-');
+        let idParts = selectedBoxElement.id.split('-');
         let stepIndex = parseInt(idParts[1]);
 
         if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < dividendLength) {
@@ -642,41 +650,47 @@
     }
 
     function handleAutoAdvance() {
-        if (!lastFocusedInput) return;
+        if (!selectedBoxElement) return;
         
         let zeroChar = formatDigit(0);
-        if (lastFocusedInput.id.startsWith('q-') && lastFocusedInput.value === zeroChar) {
-            let trigger = zeroSkipTriggers[lastFocusedInput.id];
+        let currentVal = selectedBoxElement.getAttribute('data-val');
+
+        if (selectedBoxElement.id.startsWith('q-') && currentVal === zeroChar) {
+            let trigger = zeroSkipTriggers[selectedBoxElement.id];
             if (trigger && trigger.nextTargetId) {
                 let nextTargetBox = document.getElementById(trigger.nextTargetId);
                 if (nextTargetBox) {
-                    setTimeout(() => { nextTargetBox.focus(); }, 100);
-                    updateVisualWobble();
+                    setTimeout(() => { selectBox(nextTargetBox); }, 100);
                     return;
                 }
             }
         }
 
-        if (lastFocusedInput.value.length >= 1) {
-            let currentIndex = activeInputsSequence.indexOf(lastFocusedInput.id);
+        if (currentVal.length >= 1) {
+            let currentIndex = activeInputsSequence.indexOf(selectedBoxElement.id);
             if (currentIndex !== -1 && currentIndex < activeInputsSequence.length - 1) {
-                let nextInput = document.getElementById(activeInputsSequence[currentIndex + 1]);
-                if (nextInput) nextInput.focus();
+                let nextBox = document.getElementById(activeInputsSequence[currentIndex + 1]);
+                if (nextBox) selectBox(nextBox);
             }
         }
-        updateVisualWobble(); 
     }
 
     function pressNumber(num) {
-        if (lastFocusedInput && !lastFocusedInput.disabled) {
-            lastFocusedInput.value = num;
+        if (selectedBoxElement) {
+            selectedBoxElement.setAttribute('data-val', num);
+            selectedBoxElement.innerText = num;
             handleAutoAdvance();
         }
     }
 
     function pressClear() {
-        if (lastFocusedInput && !lastFocusedInput.disabled) {
-            lastFocusedInput.value = '';
+        if (selectedBoxElement) {
+            selectedBoxElement.setAttribute('data-val', '');
+            if (selectedBoxElement.id.startsWith('down-')) {
+                selectedBoxElement.innerText = "↓";
+            } else {
+                selectedBoxElement.innerText = '';
+            }
         }
     }
 
@@ -685,25 +699,28 @@
             let digitBox = document.getElementById(`dividend-digit-${i}`);
             if (digitBox) digitBox.classList.remove('active-dividend-target');
         }
+        if (selectedBoxElement) {
+            selectedBoxElement.classList.remove('selected-target');
+        }
 
         let zeroChar = formatDigit(0);
-        const inputs = platform.querySelectorAll('input:not([disabled])');
+        const boxes = platform.querySelectorAll('.box:not(.disabled-box):not(.divisor-box):not(.dividend-box)');
         
-        inputs.forEach(input => {
-            const userAnswer = input.value.trim();
-            const correctAnswer = input.getAttribute('data-ans');
-            const isLeftZero = input.getAttribute('data-is-left-zero') === 'true';
+        boxes.forEach(box => {
+            let userAns = box.getAttribute('data-val').trim();
+            let correctAns = box.getAttribute('data-ans');
+            let isLeftZero = box.getAttribute('data-is-left-zero') === 'true';
 
-            if (isLeftZero && correctAnswer === zeroChar && (userAnswer === zeroChar || userAnswer === '')) {
-                input.classList.add('correct');
-                if (userAnswer === '') input.value = zeroChar; 
+            if (isLeftZero && correctAns === zeroChar && (userAns === zeroChar || userAns === '')) {
+                box.classList.add('correct');
+                box.innerText = zeroChar;
             } 
-            else if (userAnswer === correctAnswer || (correctAnswer === zeroChar && userAnswer === '')) {
-                input.classList.add('correct');
-                if (userAnswer === '') input.value = zeroChar;
+            else if (userAns === correctAns || (correctAns === zeroChar && userAns === '')) {
+                box.classList.add('correct');
+                box.innerText = correctAns;
             } else {
-                input.classList.add('incorrect');
-                input.value = correctAnswer; 
+                box.classList.add('incorrect');
+                box.innerText = correctAns; 
             }
         });
 
