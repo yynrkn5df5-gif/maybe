@@ -1,0 +1,912 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الأستاذ أحمد أبو جبل التعليمية - الضرب الرأسي المطور (الأرقام الإنجليزية)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 15px 20px 10px 20px;
+            width: 100%;
+            max-width: 720px;
+            min-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes goldGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .gold-watermark-bg {
+            position: relative;
+        }
+        
+        .gold-watermark-bg::before {
+            content: "الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل\A الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل\A الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل\A الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل   الأستاذ أحمد أبو جبل";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            width: 160%;
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 3;
+            text-align: center;
+            white-space: pre-line;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(90deg, #d4af37, #f3e5ab, #aa771c, #f3e5ab, #d4af37);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.15;
+            animation: goldGlow 8s ease infinite;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .question-number {
+            color: #666;
+            font-size: 17px;
+        }
+
+        .problem-container {
+            background: rgba(248, 249, 250, 0.85);
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin-bottom: 0px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .math-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 75px) 40px; 
+            row-gap: 8px;
+            column-gap: 10px; 
+            align-items: center;
+            justify-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .box {
+            width: 75px;
+            height: 75px;
+            border: 4px solid #333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .box.hidden-box {
+            visibility: hidden !important;
+            pointer-events: none;
+            border: none;
+            background: transparent;
+        }
+
+        .box.u-col-0 { border-color: #e74c3c; background: rgba(250, 219, 216, 0.9); }
+        .box.u-col-1 { border-color: #27ae60; background: rgba(213, 244, 230, 0.9); }
+        .box.u-col-2 { border-color: #3498db; background: rgba(214, 234, 248, 0.9); }
+        .box.u-col-3 { border-color: #f39c12; background: rgba(253, 235, 208, 0.9); }
+        .box.u-col-4 { border-color: #9b59b6; background: rgba(235, 222, 240, 0.9); }
+
+        .box.fixed-zero { border-color: #e74c3c; background: #f5b7b1; color: #c0392b; }
+        .box.carry-box { border: 3px dashed #ff6b6b; background: #ffe0e0; color: #c0392b; }
+
+        .carry-split-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            flex-direction: row;
+        }
+        .carry-half {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .carry-half:first-child {
+            border-left: 1px dashed #ff6b6b;
+        }
+
+        .box input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            outline: none;
+        }
+
+        .carry-half input {
+            font-size: 24px;
+        }
+
+        @keyframes activePulse {
+            0% { box-shadow: 0 0 4px #eab308; border-color: #eab308; transform: scale(1.0); }
+            50% { box-shadow: 0 0 16px #eab308; border-color: #ca8a04; transform: scale(1.03); }
+            100% { box-shadow: 0 0 4px #eab308; border-color: #eab308; transform: scale(1.0); }
+        }
+
+        .box.active-writing-box {
+            animation: activePulse 1.4s infinite ease-in-out !important;
+            z-index: 12 !important;
+        }
+        .carry-half.active-writing-half {
+            background-color: #fef9c3;
+            animation: activePulse 1.4s infinite ease-in-out !important;
+        }
+
+        @keyframes attentionRotate {
+            0% { transform: rotate(0deg) scale(1.05); }
+            25% { transform: rotate(5deg) scale(1.05); background-color: #fef9c3 !important; }
+            75% { transform: rotate(-5deg) scale(1.05); background-color: #fef9c3 !important; }
+            100% { transform: rotate(0deg) scale(1.05); }
+        }
+
+        .attention-active {
+            animation: attentionRotate 0.8s ease-in-out infinite !important;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.5) !important;
+            border-color: #eab308 !important;
+            z-index: 10;
+        }
+
+        .sign {
+            font-size: 38px;
+            font-weight: bold;
+            color: #333;
+            grid-column: 6;
+            justify-self: start; 
+            margin-right: -5px; 
+            position: relative;
+            z-index: 3;
+        }
+
+        .grid-line {
+            grid-column: 1 / span 6;
+            height: 4px;
+            background: #333;
+            width: 100%;
+            border-radius: 3px;
+            margin: 1px 0;
+            position: relative;
+            z-index: 3;
+        }
+
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        #error-screen { background: rgba(255, 245, 245, 0.96); }
+        #success-screen { background: rgba(240, 253, 244, 0.96); }
+
+        .screen-title {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .error-title { color: #c0392b; }
+        .success-title { color: #16a34a; }
+
+        .explanation-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #f1c40f;
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 620px;
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            font-size: 20px;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .explanation-container span.highlight {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .success-badge {
+            font-size: 70px;
+            margin-bottom: 10px;
+            animation: bounce 1s infinite alternate;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-15px); }
+        }
+
+        .success-msg-text {
+            font-size: 24px;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin-bottom: 25px;
+            background: rgba(219, 234, 254, 0.9);
+            padding: 12px 25px;
+            border-radius: 12px;
+            border: 2px dashed #3b82f6;
+            position: relative;
+            z-index: 5;
+        }
+
+        .custom-keyboard {
+            background: #e2e8f0;
+            padding: 8px;
+            border-radius: 0px 0px 14px 14px; 
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: -5px; 
+            margin-bottom: 10px; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .key-btn {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            flex: 1;
+            height: 52px; 
+            background: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .key-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .key-btn.delete-btn {
+            background: #fca5a5;
+            color: #991b1b;
+            box-shadow: 0 3px 0 #f87171;
+            font-size: 18px;
+            flex: 1.5; 
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .action-btn {
+            padding: 10px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .btn-retry { background: #e74c3c; color: white; }
+        .btn-retry:hover { background: #c0392b; }
+
+        .btn-next { background: #27ae60; color: white; }
+        .btn-next:hover { background: #229954; }
+
+        @media (max-width: 650px) {
+            .math-grid {
+                grid-template-columns: repeat(5, 52px) 30px;
+                row-gap: 6px;
+                column-gap: 5px;
+            }
+            .box {
+                width: 52px;
+                height: 52px;
+                font-size: 22px;
+                border-width: 3px;
+                border-radius: 8px;
+            }
+            .gold-watermark-bg::before {
+                font-size: 18px;
+                line-height: 2.6;
+                width: 180%;
+            }
+            .box input { font-size: 18px; }
+            .sign { font-size: 24px; margin-right: -2px;}
+            .key-btn { height: 45px; font-size: 20px; }
+            .key-btn.delete-btn { font-size: 15px; }
+            .action-btn { padding: 10px 20px; font-size: 15px; }
+            .explanation-container { font-size: 16px; padding: 12px; }
+            .screen-title { font-size: 22px; }
+            .success-msg-text { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <div class="overlay-screen gold-watermark-bg" id="error-screen">
+            <div class="screen-title error-title">ركّز يا بطل.. تعلّم طريقة الحل الصحيحة:</div>
+            <div class="explanation-container" id="explanation-text"></div>
+            <button class="action-btn btn-retry" onclick="retryQuestion()">أنا مستعد لإعادة المحاولة 💪</button>
+        </div>
+
+        <div class="overlay-screen gold-watermark-bg" id="success-screen">
+            <div class="success-badge">🏆⭐</div>
+            <div class="screen-title success-title">رائع جداً يا ذكي!</div>
+            <div class="success-msg-text">أحسنت إجابة ممتازة وتقدم ملحوظ 🌟</div>
+            <button class="action-btn btn-next" onclick="nextQuestion()">المسألة التالية 🚀</button>
+        </div>
+
+        <div class="header">
+            <h1>منصة الأستاذ أحمد أبو جبل التعليمية</h1>
+            <p class="question-number">السؤال <span id="question-num">1</span> من 10</p>
+        </div>
+
+        <div class="problem-container gold-watermark-bg">
+            <div class="math-grid" id="main-math-grid"></div>
+        </div>
+
+        <div class="custom-keyboard" id="keyboard-container">
+            <div class="keyboard-row">
+                <button class="key-btn" onclick="typeNumber('1')">1</button>
+                <button class="key-btn" onclick="typeNumber('2')">2</button>
+                <button class="key-btn" onclick="typeNumber('3')">3</button>
+                <button class="key-btn" onclick="typeNumber('4')">4</button>
+                <button class="key-btn" onclick="typeNumber('5')">5</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-btn" onclick="typeNumber('6')">6</button>
+                <button class="key-btn" onclick="typeNumber('7')">7</button>
+                <button class="key-btn" onclick="typeNumber('8')">8</button>
+                <button class="key-btn" onclick="typeNumber('9')">9</button>
+                <button class="key-btn" onclick="typeNumber('0')">0</button>
+                <button class="key-btn delete-btn" onclick="typeDelete()">مسح ⌫</button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn btn-retry" style="background:#95a5a6;" onclick="resetCurrentFields()">إعادة مسح</button>
+            <button class="action-btn btn-next" onclick="nextQuestion()">السؤال التالي</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = null;
+        let questionCount = 0;
+        let activeInput = null; 
+        let navigationOrder = []; 
+
+        function playErrorSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const playBeep = (delay) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.value = 220; 
+                    oscillator.type = 'sawtooth';     
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime + delay);
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + delay + 0.08); 
+                    oscillator.start(audioContext.currentTime + delay);
+                    oscillator.stop(audioContext.currentTime + delay + 0.1);
+                };
+                playBeep(0); playBeep(0.15); playBeep(0.3);
+            } catch(e) { console.log("Audio error"); }
+        }
+
+        function generateQuestion() {
+            activeInput = null;
+            document.getElementById('error-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'none';
+
+            const num1 = Math.floor(Math.random() * 900) + 100; 
+            const num2 = Math.floor(Math.random() * 90) + 10;   
+
+            const unitsDigit = num2 % 10;
+            const tensDigit = Math.floor(num2 / 10);
+
+            const firstProduct = num1 * unitsDigit;
+            const secondProduct = num1 * tensDigit * 10; 
+            const finalAnswer = num1 * num2;
+
+            const digitsN1 = num1.toString().split('').map(Number);
+            const c_u = digitsN1[2];
+            const c_t = digitsN1[1];
+            const c_h = digitsN1[0];
+
+            const p1_carry1 = Math.floor((c_u * unitsDigit) / 10);
+            const p1_carry2 = Math.floor((c_t * unitsDigit + p1_carry1) / 10);
+
+            const p2_carry1 = Math.floor((c_u * tensDigit) / 10);
+            const p2_carry2 = Math.floor((c_t * tensDigit + p2_carry1) / 10);
+
+            const needCarryTens = (p1_carry1 > 0 || p2_carry1 > 0);
+            const needCarryHundreds = (p1_carry2 > 0 || p2_carry2 > 0);
+
+            currentQuestion = { 
+                num1, num2, unitsDigit, tensDigit, firstProduct, secondProduct, finalAnswer,
+                p1_carry1, p1_carry2, p2_carry1, p2_carry2,
+                needCarryTens, needCarryHundreds
+            };
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            questionCount++;
+            document.getElementById('question-num').textContent = questionCount;
+
+            const grid = document.getElementById('main-math-grid');
+            grid.innerHTML = ''; 
+
+            const getRowArray = (num) => {
+                let str = num.toString();
+                let arr = str.split('').reverse(); 
+                while(arr.length < 5) { arr.push(' '); }
+                return arr;
+            };
+
+            const n1Arr = getRowArray(currentQuestion.num1);
+            const n2Arr = getRowArray(currentQuestion.num2);
+            const p1Arr = getRowArray(currentQuestion.firstProduct);
+            const p2Arr = getRowArray(currentQuestion.secondProduct);
+            const fArr = getRowArray(currentQuestion.finalAnswer);
+
+            // 1. صف الباقي (الحمل) العلوي المشقوق
+            for(let i = 0; i < 5; i++) {
+                if (i === 1) {
+                    const box = document.createElement('div');
+                    if (currentQuestion.needCarryTens) {
+                        box.className = 'box carry-box';
+                        box.innerHTML = `
+                            <div class="carry-split-container">
+                                <div class="carry-half" id="half-p1-carry-1">
+                                    ${currentQuestion.p1_carry1 > 0 ? '<input type="text" class="math-input" id="p1-carry-1" inputmode="none" readonly maxlength="1">' : ''}
+                                </div>
+                                <div class="carry-half" id="half-p2-carry-1">
+                                    ${currentQuestion.p2_carry1 > 0 ? '<input type="text" class="math-input" id="p2-carry-1" inputmode="none" readonly maxlength="1">' : ''}
+                                </div>
+                            </div>`;
+                    } else {
+                        box.className = 'box hidden-box';
+                    }
+                    grid.appendChild(box);
+                } else if (i === 2) {
+                    const box = document.createElement('div');
+                    if (currentQuestion.needCarryHundreds) {
+                        box.className = 'box carry-box';
+                        box.innerHTML = `
+                            <div class="carry-split-container">
+                                <div class="carry-half" id="half-p1-carry-2">
+                                    ${currentQuestion.p1_carry2 > 0 ? '<input type="text" class="math-input" id="p1-carry-2" inputmode="none" readonly maxlength="1">' : ''}
+                                </div>
+                                <div class="carry-half" id="half-p2-carry-2">
+                                    ${currentQuestion.p2_carry2 > 0 ? '<input type="text" class="math-input" id="p2-carry-2" inputmode="none" readonly maxlength="1">' : ''}
+                                </div>
+                            </div>`;
+                    } else {
+                        box.className = 'box hidden-box';
+                    }
+                    grid.appendChild(box);
+                } else {
+                    grid.appendChild(createHiddenBox());
+                }
+            }
+            grid.appendChild(createEmptyDiv());
+
+            // 2. صف المضروب
+            for(let i = 0; i < 5; i++) {
+                if(n1Arr[i] === ' ') {
+                    grid.appendChild(createHiddenBox());
+                } else {
+                    const box = document.createElement('div');
+                    box.className = `box u-col-${i}`;
+                    box.textContent = n1Arr[i];
+                    grid.appendChild(box);
+                }
+            }
+            grid.appendChild(createEmptyDiv());
+
+            // 3. صف المضروب فيه
+            for(let i = 0; i < 5; i++) {
+                if(n2Arr[i] === ' ') {
+                    grid.appendChild(createHiddenBox());
+                } else {
+                    const box = document.createElement('div');
+                    box.className = `box u-col-${i}`;
+                    box.textContent = n2Arr[i];
+                    if(i === 0) box.id = "bottom-units-box";
+                    else if(i === 1) box.id = "bottom-tens-box";
+                    grid.appendChild(box);
+                }
+            }
+            const multSign = document.createElement('div');
+            multSign.className = 'sign';
+            multSign.textContent = '×';
+            grid.appendChild(multSign);
+
+            const line1 = document.createElement('div');
+            line1.className = 'grid-line';
+            grid.appendChild(line1);
+
+            // 4. السطر الجزئي الأول (الآحاد)
+            for(let i = 0; i < 5; i++) {
+                if(p1Arr[i] === ' ') {
+                    grid.appendChild(createHiddenBox()); 
+                } else {
+                    const box = document.createElement('div');
+                    box.className = `box u-col-${i}`;
+                    box.innerHTML = `<input type="text" class="math-input" id="p1-${i}" inputmode="none" readonly data-type="p1" data-idx="${i}" maxlength="1">`;
+                    grid.appendChild(box);
+                }
+            }
+            grid.appendChild(createEmptyDiv());
+
+            // 5. السطر الجزئي الثاني (العشرات) + الصفر الثابت
+            for(let i = 0; i < 5; i++) {
+                if(p2Arr[i] === ' ') {
+                    grid.appendChild(createHiddenBox());
+                } else {
+                    const box = document.createElement('div');
+                    if(i === 0) {
+                        box.className = `box fixed-zero u-col-0`;
+                        box.textContent = '0';
+                        box.id = "fixed-zero-box"; 
+                    } else {
+                        box.className = `box u-col-${i}`;
+                        box.innerHTML = `<input type="text" class="math-input" id="p2-${i}" inputmode="none" readonly data-type="p2" data-idx="${i}" maxlength="1">`;
+                    }
+                    grid.appendChild(box);
+                }
+            }
+            const plusSign = document.createElement('div');
+            plusSign.className = 'sign';
+            plusSign.textContent = '+';
+            grid.appendChild(plusSign);
+
+            const line2 = document.createElement('div');
+            line2.className = 'grid-line';
+            grid.appendChild(line2);
+
+            // 6. صف الناتج النهائي
+            for(let i = 0; i < 5; i++) {
+                if(fArr[i] === ' ') {
+                    grid.appendChild(createHiddenBox());
+                } else {
+                    const box = document.createElement('div');
+                    box.className = `box u-col-${i}`;
+                    box.innerHTML = `<input type="text" class="math-input" id="final-${i}" inputmode="none" readonly data-type="final" data-idx="${i}" maxlength="1">`;
+                    grid.appendChild(box);
+                }
+            }
+            grid.appendChild(createEmptyDiv());
+
+            buildNavigationOrder();
+            setupInputController();
+            updateVisualAttention();
+        }
+
+        function createEmptyDiv() { return document.createElement('div'); }
+        function createHiddenBox() {
+            const div = document.createElement('div');
+            div.className = 'box hidden-box';
+            return div;
+        }
+
+        function buildNavigationOrder() {
+            navigationOrder = [];
+
+            // أ) مسار السطر الجزئي الأول (الآحاد)
+            for (let i = 0; i < 5; i++) {
+                const p1Inp = document.getElementById(`p1-${i}`);
+                if (p1Inp) {
+                    navigationOrder.push(p1Inp); 
+                    const carryP1Inp = document.getElementById(`p1-carry-${i+1}`);
+                    if (carryP1Inp) {
+                        navigationOrder.push(carryP1Inp);
+                    }
+                }
+            }
+
+            // ب) مسار السطر الجزئي الثاني (العشرات)
+            for (let i = 0; i < 5; i++) {
+                const p2Inp = document.getElementById(`p2-${i}`);
+                if (p2Inp) {
+                    navigationOrder.push(p2Inp); 
+                    const carryP2Inp = document.getElementById(`p2-carry-${i}`);
+                    if (carryP2Inp) {
+                        navigationOrder.push(carryP2Inp);
+                    }
+                }
+            }
+
+            // ج) مسار سطر الناتج النهائي (الجمع)
+            for (let i = 0; i < 5; i++) {
+                const finalInp = document.getElementById(`final-${i}`);
+                if (finalInp) navigationOrder.push(finalInp);
+            }
+        }
+
+        function setupInputController() {
+            const allInputs = document.querySelectorAll('.math-input');
+            allInputs.forEach((input) => {
+                input.addEventListener('focus', function() {
+                    activeInput = input;
+                    highlightActiveBox(); 
+                });
+            });
+
+            if (navigationOrder.length > 0) {
+                navigationOrder[0].focus();
+                activeInput = navigationOrder[0];
+                highlightActiveBox();
+            }
+        }
+
+        function highlightActiveBox() {
+            document.querySelectorAll('.box').forEach(box => {
+                box.classList.remove('active-writing-box');
+            });
+            document.querySelectorAll('.carry-half').forEach(half => {
+                half.classList.remove('active-writing-half');
+            });
+            
+            if (activeInput) {
+                const parentHalf = activeInput.closest('.carry-half');
+                if (parentHalf) {
+                    parentHalf.classList.add('active-writing-half');
+                } else if (activeInput.parentElement) {
+                    activeInput.parentElement.classList.add('active-writing-box');
+                }
+            }
+        }
+
+        function updateVisualAttention() {
+            const unitsBox = document.getElementById('bottom-units-box');
+            const tensBox = document.getElementById('bottom-tens-box');
+            const zeroBox = document.getElementById('fixed-zero-box');
+            if (!unitsBox || !tensBox) return;
+
+            let isP1Complete = true;
+            const p1Inputs = document.querySelectorAll('input[data-type="p1"]');
+            p1Inputs.forEach(inp => { 
+                if (inp.value.trim() === '') isP1Complete = false; 
+            });
+
+            if (!isP1Complete) {
+                unitsBox.classList.add('attention-active');
+                tensBox.classList.remove('attention-active');
+                if(zeroBox) zeroBox.classList.remove('attention-active');
+            } else {
+                unitsBox.classList.remove('attention-active');
+                tensBox.classList.add('attention-active');
+                if(zeroBox) zeroBox.classList.add('attention-active');
+            }
+        }
+
+        function typeNumber(num) {
+            if (!activeInput) {
+                if (navigationOrder.length > 0) {
+                    activeInput = navigationOrder[0];
+                    activeInput.focus();
+                } else return;
+            }
+
+            activeInput.value = num;
+            
+            const currentIndex = navigationOrder.indexOf(activeInput);
+            if (currentIndex !== -1 && currentIndex < navigationOrder.length - 1) {
+                const nextInput = navigationOrder[currentIndex + 1];
+                nextInput.focus();
+                activeInput = nextInput;
+            }
+            
+            highlightActiveBox();
+            updateVisualAttention();
+            validateCurrentMatrix();
+        }
+
+        function typeDelete() {
+            if (!activeInput) return;
+
+            if (activeInput.value !== '') {
+                activeInput.value = '';
+            } else {
+                const currentIndex = navigationOrder.indexOf(activeInput);
+                if (currentIndex > 0) {
+                    const prevInput = navigationOrder[currentIndex - 1];
+                    prevInput.focus();
+                    activeInput = prevInput;
+                    activeInput.value = '';
+                }
+            }
+            
+            highlightActiveBox();
+            updateVisualAttention();
+            validateCurrentMatrix();
+        }
+
+        function collectRowValue(type) {
+            let numStr = '';
+            for(let i=0; i<5; i++) {
+                const inp = document.getElementById(`${type}-${i}`);
+                if(inp) {
+                    if(inp.value === '') return null; 
+                    numStr = inp.value + numStr; 
+                } else {
+                    if(type === 'p2' && i === 0) { numStr = '0' + numStr; }
+                }
+            }
+            return numStr === '' ? null : parseInt(numStr);
+        }
+
+        function validateCurrentMatrix() {
+            let allFilled = true;
+            navigationOrder.forEach(inp => {
+                if (inp.value === '') allFilled = false;
+            });
+
+            if (allFilled) {
+                const p1Val = collectRowValue('p1');
+                const p2Val = collectRowValue('p2');
+                const finalVal = collectRowValue('final');
+
+                document.querySelectorAll('.box').forEach(box => {
+                    box.classList.remove('active-writing-box');
+                    box.classList.remove('attention-active');
+                });
+                document.querySelectorAll('.carry-half').forEach(half => {
+                    half.classList.remove('active-writing-half');
+                });
+
+                if (p1Val === currentQuestion.firstProduct &&
+                    p2Val === currentQuestion.secondProduct &&
+                    finalVal === currentQuestion.finalAnswer) {
+
+                    document.getElementById('success-screen').style.display = 'flex';
+                } else {
+                    const errorScreen = document.getElementById('error-screen');
+                    const expText = document.getElementById('explanation-text');
+
+                    expText.innerHTML = `
+                        • نضرب العدد العلوي كاملاً في رقم الآحاد <span class="highlight" style="background:#fadbd8; color:#c0392b;">(${currentQuestion.unitsDigit})</span>:<br>
+                        &nbsp;&nbsp;&nbsp; ${currentQuestion.num1} × ${currentQuestion.unitsDigit} = <span style="color:#e74c3c; font-weight:bold;">${currentQuestion.firstProduct}</span> (السطر الجزئي الأول)<br><br>
+                        • نضع صفر الحفظ يمين، ثم نضرب في رقم العشرات <span class="highlight" style="background:#d5f4e6; color:#27ae60;">(${currentQuestion.tensDigit})</span>:<br>
+                        &nbsp;&nbsp;&nbsp; ${currentQuestion.num1} × ${currentQuestion.tensDigit}0 = <span style="color:#27ae60; font-weight:bold;">${currentQuestion.secondProduct}</span> (السطر الجزئي الثاني)<br><br>
+                        • نجمع السطرين معاً للحصول على <span class="highlight" style="background:#d6eaf8; color:#2980b9;">الناتج الإجمالي النهائي</span>:<br>
+                        &nbsp;&nbsp;&nbsp; ${currentQuestion.firstProduct} + ${currentQuestion.secondProduct} = <span style="color:#3498db; font-size:26px; font-weight:bold;">${currentQuestion.finalAnswer}</span>
+                    `;
+
+                    errorScreen.style.display = 'flex';
+                    playErrorSound();
+                }
+            }
+        }
+
+        function retryQuestion() {
+            document.getElementById('error-screen').style.display = 'none';
+            resetCurrentFields();
+        }
+
+        function resetCurrentFields() {
+            document.querySelectorAll('.math-input').forEach(inp => {
+                inp.value = '';
+            });
+            setupInputController();
+            updateVisualAttention();
+        }
+
+        function nextQuestion() {
+            if (questionCount >= 10) {
+                alert('🎉 ممتاز يا بطل! لقد أنهيت الأسئلة العشرة كاملة بنجاح!');
+                questionCount = 0;
+            }
+            generateQuestion();
+        }
+
+        window.onload = generateQuestion;
+    </script>
+</body>
+</html>
